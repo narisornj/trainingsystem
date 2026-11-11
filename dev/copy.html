@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8"><title>copy helper</title>
+<style>body{font:16px sans-serif;padding:20px}button{font-size:20px;margin:10px;padding:20px 30px}</style>
+<button id="Code.gs">Code.gs</button><button id="Seed.gs">Seed.gs</button><button id="Index.html">Index.html</button>
+<p id="s">-</p>
+<script>
+document.querySelectorAll('button').forEach(b=>b.onclick=async()=>{ try{
+  const t=await fetch('../'+b.id+'?'+Date.now()).then(r=>r.text());
+  const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select();
+  const ok=document.execCommand('copy'); ta.remove(); if(!ok) throw new Error('copy failed');
+  document.getElementById('s').textContent='copied '+b.id+' '+t.length; }catch(e){ document.getElementById('s').textContent='ERR '+e.message; }
+});
+</script>

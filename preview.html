@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ระบบบันทึกการอบรม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f2f4f8; --surface:#fff; --surface-2:#f7f9fc; --line:#e1e6ee; --line-strong:#c9d2df;
+  --ink:#1a2233; --ink-2:#465166; --muted:#768195;
+  --primary:#295687; --primary-hover:#1f4570; --primary-soft:#e7eef7; --nav:#1d2a48;
+  --bar:#3a6ea6; --bar-soft:#e3ebf5;
+  --ok:#1d7347; --ok-soft:#e3f3ea; --warn:#8a5300; --warn-soft:#fcf0d9; --bad:#b42318; --bad-soft:#fde7e5;
+  --r:10px; --shadow:0 1px 2px rgba(16,24,40,.05),0 2px 6px rgba(16,24,40,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Sarabun',system-ui,sans-serif;font-size:15px;line-height:1.55;color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;line-height:1.3}
+a{color:var(--primary)}
+.muted{color:var(--muted)}
+[hidden]{display:none!important}
+
+/* header */
+.top{background:var(--nav);color:#fff}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 16px 0}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:38px;height:38px;border-radius:9px;background:#3c8ac9;display:grid;place-items:center;flex:none}
+.brand h1{font-size:19px;font-weight:600}
+.brand p{margin:0;font-size:13px;opacity:.75}
+.tabs{display:flex;gap:4px;margin-top:12px;overflow-x:auto}
+.tab{background:none;border:0;color:#c8d2e6;padding:10px 16px;border-radius:9px 9px 0 0;cursor:pointer;font-weight:500;white-space:nowrap}
+.tab:hover{color:#fff;background:rgba(255,255,255,.06)}
+.tab[aria-selected=true]{background:var(--bg);color:var(--ink)}
+.badge{display:inline-block;min-width:20px;padding:0 6px;border-radius:99px;font-size:12px;font-weight:600;text-align:center;line-height:20px}
+.badge.warn{background:var(--warn-soft);color:var(--warn)}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}
+.badge.mute{background:#eceff4;color:var(--muted)}
+.tab .badge{margin-left:6px}
+
+main{max-width:1180px;margin:0 auto;padding:20px 16px 96px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.card-h h2{font-size:17px;font-weight:600}
+.card-h .sp{flex:1}
+.step{width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:600;flex:none}
+.card.off{opacity:.55;pointer-events:none}
+
+/* forms */
+.field{margin-bottom:14px;min-width:0}
+.field>label,.lbl{display:block;font-weight:500;font-size:14px;margin-bottom:5px;color:var(--ink-2)}
+.opt-tag{font-weight:400;color:var(--muted);font-size:12px}
+input[type=text],input[type=search],input[type=number],input[type=date],input[type=password],input[type=email],select,textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;min-height:40px}
+textarea{min-height:140px;resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid #8db4e0;outline-offset:1px;border-color:var(--primary)}
+.hint{font-size:13px;color:var(--muted);margin:5px 0 0}
+.hint.warn{color:var(--warn)}
+.grid{display:grid;gap:0 14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:720px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);border-radius:99px;padding:6px 12px;cursor:pointer;font-size:14px;background:#fff}
+.seg input{accent-color:var(--primary);margin:0}
+.seg label:has(input:checked){border-color:var(--primary);background:var(--primary-soft);color:var(--primary);font-weight:500}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line-strong);background:#fff;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:500;min-height:40px;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.primary:hover{background:var(--primary-hover)}
+.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.ghost{border-style:dashed;color:var(--primary);width:100%}
+.btn.sm{min-height:32px;padding:4px 10px;font-size:14px}
+.link{background:none;border:0;padding:2px 4px;color:var(--primary);cursor:pointer;font-weight:500}
+.link.danger{color:var(--bad)}
+.link:hover{text-decoration:underline}
+
+/* combobox */
+.combo{position:relative}
+.combo-list{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line-strong);border-radius:8px;box-shadow:0 8px 24px rgba(16,24,40,.14);max-height:300px;overflow:auto}
+.combo-list .o{padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f2f6}
+.combo-list .o small{display:block;color:var(--muted);font-size:12.5px}
+.combo-list .o.act,.combo-list .o:hover{background:var(--primary-soft)}
+.combo-list .o.new{color:var(--primary);font-weight:500}
+.combo-list .empty{padding:10px 12px;color:var(--muted)}
+mark{background:#fff0b3;color:inherit;border-radius:2px}
+
+.person{display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px 14px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;font-size:14px}
+.person b{font-weight:600}
+.person span{color:var(--ink-2)}
+
+.item{border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px;background:var(--surface-2)}
+.item-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.item-h b{font-weight:600;color:var(--primary)}
+.filebox{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.filebox .ok{color:var(--ok);font-size:14px}
+
+.savebar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);z-index:20;backdrop-filter:blur(6px)}
+.savebar-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;justify-content:flex-end}
+.savebar-in .muted{flex:1;font-size:14px}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600;color:var(--ink-2);white-space:nowrap;position:sticky;top:0}
+tbody tr:hover td{background:#fafbfd}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td.act{white-space:nowrap;text-align:right}
+tr.inactive td{color:var(--muted)}
+table.rep td{border-right:1px solid var(--line)}
+table.rep td:last-child{border-right:0}
+table.rep tbody{border-bottom:2px solid var(--line-strong)}
+.empty-row{color:var(--muted);font-style:italic}
+
+/* report */
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.filters .field{margin:0;flex:1 1 160px}
+.filters .actions{display:flex;gap:8px;margin-left:auto}
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0}
+.subtab{border:1px solid var(--line-strong);background:#fff;border-radius:99px;padding:6px 14px;cursor:pointer;font-weight:500;font-size:14px}
+.subtab[aria-selected=true]{background:var(--primary);border-color:var(--primary);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .k{font-size:13px;color:var(--ink-2)}
+.kpi .v{font-size:28px;font-weight:700;line-height:1.2;margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:13px;color:var(--muted)}
+.meter{height:6px;background:var(--bar-soft);border-radius:99px;margin-top:8px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--bar);border-radius:99px}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.charts .wide{grid-column:1/-1}
+.charts .card{margin:0}
+.tbl-wrap table{min-width:640px}
+@media (max-width:860px){.charts{grid-template-columns:1fr}}
+.chart-t{font-size:15px;font-weight:600;margin:0 0 2px}
+.chart-s{font-size:13px;color:var(--muted);margin:0 0 12px}
+.vbars{display:flex;align-items:flex-end;gap:6px;height:180px;border-bottom:1px solid var(--line-strong);padding-top:18px;background:repeating-linear-gradient(to top,transparent 0,transparent 44px,#eef1f5 44px,#eef1f5 45px)}
+.vb{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0;cursor:default}
+.vb i{display:block;width:min(100%,34px);background:var(--bar);border-radius:4px 4px 0 0;min-height:0}
+.vb:hover i{background:var(--primary-hover)}
+.vb .n{font-size:12px;color:var(--ink-2);margin-bottom:2px;font-variant-numeric:tabular-nums}
+.vlabels{display:flex;gap:6px;margin-top:6px}
+.vlabels span{flex:1;text-align:center;font-size:12px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbars{display:flex;flex-direction:column;gap:8px}
+.hb{display:grid;grid-template-columns:minmax(0,42%) 1fr 36px;gap:10px;align-items:center;font-size:14px}
+.hb-l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+.hb-t{height:14px;background:var(--bar-soft);border-radius:0 4px 4px 0}
+.hb-t i{display:block;height:100%;background:var(--bar);border-radius:0 4px 4px 0}
+.hb:hover .hb-t i{background:var(--primary-hover)}
+.hb-v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+#tip{position:fixed;z-index:60;pointer-events:none;background:#1a2233;color:#fff;font-size:13px;padding:6px 10px;border-radius:6px;max-width:320px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.notice{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:8px;font-size:14px;margin-bottom:14px}
+.notice.warn{background:var(--warn-soft);color:var(--warn)}
+.notice.info{background:var(--primary-soft);color:var(--primary)}
+
+/* admin */
+.adm{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.adm{grid-template-columns:1fr}}
+.side{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px;position:sticky;top:12px}
+.side h4{margin:10px 10px 4px;font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.side button{display:flex;width:100%;justify-content:space-between;align-items:center;background:none;border:0;padding:8px 10px;border-radius:7px;cursor:pointer;text-align:left}
+.side button:hover{background:var(--surface-2)}
+.side button[aria-current=true]{background:var(--primary-soft);color:var(--primary);font-weight:600}
+@media (max-width:860px){.side{position:static;display:flex;flex-wrap:wrap;gap:4px}.side h4{display:none}.side button{width:auto;border:1px solid var(--line)}}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.toolbar input[type=search]{flex:1 1 220px;width:auto}
+.toolbar select{width:auto}
+.st{font-size:12.5px;padding:1px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
+.st.on{background:var(--ok-soft);color:var(--ok)}
+.st.off{background:#eceff4;color:var(--muted)}
+.st.pend{background:var(--warn-soft);color:var(--warn)}
+.quality{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.qchip{border:1px solid #f0d9ae;background:var(--warn-soft);color:var(--warn);border-radius:99px;padding:5px 12px;font-size:13.5px;cursor:pointer;font-weight:500}
+.login{max-width:380px;margin:40px auto}
+
+/* modal, toast, busy */
+#modal{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;display:grid;place-items:center;padding:16px}
+.mbox{background:#fff;border-radius:12px;width:min(640px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.mh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.mh h3{font-size:17px}
+.mb{padding:18px 20px;overflow:auto}
+.mf{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--line)}
+.x{background:none;border:0;font-size:24px;line-height:1;cursor:pointer;color:var(--muted)}
+#toasts{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:70;display:flex;flex-direction:column;gap:8px;width:min(460px,calc(100% - 32px))}
+.toast{padding:11px 16px;border-radius:9px;background:#1a2233;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:14.5px}
+.toast.ok{background:var(--ok)} .toast.bad{background:var(--bad)}
+#busy{position:fixed;inset:0;background:rgba(255,255,255,.55);z-index:80;display:grid;place-items:center}
+.spin{width:40px;height:40px;border:4px solid var(--primary-soft);border-top-color:var(--primary);border-radius:50%;animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.boot{padding:80px 16px;text-align:center;color:var(--muted)}
+
+.print-only{display:none}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  body{background:#fff;font-size:12px}
+  .top,.filters,.subtabs,.savebar,.no-print,#toasts{display:none!important}
+  main{padding:0;max-width:none}
+  .card,.kpi{box-shadow:none;border-color:#bbb}
+  .print-only{display:block;text-align:center;margin-bottom:12px}
+  .print-only h2{font-size:16px}
+  .tbl-wrap{overflow:visible;border:0}
+  table.rep tbody{break-inside:avoid}
+  th{position:static}
+  .charts{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>
+      </div>
+      <div><h1 id="appTitle">ระบบบันทึกการอบรมพัฒนาทักษะดิจิทัล</h1><p id="orgName"></p></div>
+    </div>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+  </div>
+</header>
+<main id="main"><div class="boot"><div class="spin" style="margin:0 auto 12px"></div>กำลังโหลดข้อมูล...</div></main>
+<div id="modal" hidden></div>
+<div id="toasts" aria-live="polite"></div>
+<div id="busy" hidden><div class="spin"></div></div>
+<div id="tip" hidden></div>
+
+<script>
+/*
+ * ตัวจำลอง Google Apps Script สำหรับทดลองระบบในเบราว์เซอร์ (preview.html เท่านั้น — ไม่ต้องอัปโหลดไฟล์นี้ขึ้น Apps Script)
+ * ข้อมูลเก็บใน localStorage ของเบราว์เซอร์   ล้างข้อมูล: เปิด preview.html?reset
+ */
+(function () {
+  const KEY = 'training-preview-db';
+  if (location.search.includes('reset')) localStorage.removeItem(KEY);
+  let db = JSON.parse(localStorage.getItem(KEY) || 'null') || { sheets: {}, props: {} };
+  const save = () => localStorage.setItem(KEY, JSON.stringify(db));
+
+  function Range(name, r, c, nr, nc) {
+    const rows = () => db.sheets[name];
+    return {
+      getValues() {
+        const out = [];
+        for (let i = 0; i < nr; i++) { const row = rows()[r - 1 + i] || []; out.push(Array.from({ length: nc }, (_, j) => row[c - 1 + j] ?? '')); }
+        return out;
+      },
+      setValues(v) {
+        v.forEach((row, i) => { const t = rows()[r - 1 + i] = rows()[r - 1 + i] || []; row.forEach((x, j) => t[c - 1 + j] = x); });
+        save(); return this;
+      },
+      setFontWeight() { return this; }, setBackground() { return this; }, setNumberFormat() { return this; }
+    };
+  }
+  function Sheet(name) {
+    return {
+      getLastRow: () => db.sheets[name].length,
+      getMaxRows: () => 1000,
+      getRange: (r, c, nr = 1, nc = 1) => Range(name, r, c, nr, nc),
+      appendRow(row) { db.sheets[name].push(row.slice()); save(); },
+      deleteRow(r) { db.sheets[name].splice(r - 1, 1); save(); },
+      setFrozenRows() {},
+      getName: () => name,
+      clearContents() { db.sheets[name] = []; save(); },
+      getProtections: () => (db.prot[name] ? [1] : []),
+      protect() { db.prot[name] = 1; const pr = { setDescription: () => pr, setWarningOnly: () => pr }; return pr; }
+    };
+  }
+  db.prot = db.prot || {};
+  const ss = {
+    getSheetByName: n => (db.sheets[n] ? Sheet(n) : null),
+    insertSheet: n => { db.sheets[n] = []; save(); return Sheet(n); },
+    getSheets: () => Object.keys(db.sheets).map(Sheet),
+    deleteSheet: sh => { delete db.sheets[sh.getName()]; save(); }
+  };
+  window.SpreadsheetApp = { getActiveSpreadsheet: () => ss, openById: () => ss, ProtectionType: { SHEET: 'SHEET' },
+    getUi() { throw new Error('no UI in preview'); } };
+  const props = { getProperty: k => db.props[k] ?? null, setProperty: (k, v) => { db.props[k] = String(v); save(); } };
+  window.PropertiesService = { getScriptProperties: () => props };
+  const cache = {};
+  window.CacheService = { getScriptCache: () => ({ get: k => cache[k] ?? null, put: (k, v) => { cache[k] = v; } }) };
+  window.LockService = { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) };
+  window.Logger = { log: (...a) => console.log('[Logger]', ...a) };
+  window.Utilities = {
+    getUuid: () => crypto.randomUUID(),
+    formatDate(d, tz, f) {
+      const p = n => String(n).padStart(2, '0');
+      return f.replace('yyyy', d.getFullYear()).replace('MM', p(d.getMonth() + 1)).replace('dd', p(d.getDate()))
+        .replace('HH', p(d.getHours())).replace('mm', p(d.getMinutes())).replace('ss', p(d.getSeconds())).replace(/'/g, '');
+    },
+    DigestAlgorithm: {}, Charset: {},
+    computeDigest(_a, s) { // ไม่ใช่ SHA-256 จริง ใช้แค่ในโหมดทดลอง
+      let h = 2166136261; for (const ch of s) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+      return [h >>> 24, (h >>> 16) & 255, (h >>> 8) & 255, h & 255].map(b => (b > 127 ? b - 256 : b));
+    },
+    base64Decode: b64 => Array.from(atob(b64), c => c.charCodeAt(0)),
+    newBlob: (bytes, type, name) => ({ bytes, type, name })
+  };
+  const folders = {};
+  function Folder(name) {
+    return {
+      getId: () => name,
+      getFoldersByName(n) { const k = name + '/' + n, ok = !!folders[k]; let done = false; return { hasNext: () => ok && !done, next: () => { done = true; return Folder(k); } }; },
+      createFolder(n) { folders[name + '/' + n] = 1; return Folder(name + '/' + n); },
+      createFile(blob) { console.log('[Drive]', name + '/' + blob.name); return { getUrl: () => URL.createObjectURL(new Blob([new Uint8Array(blob.bytes)], { type: blob.type })) }; }
+    };
+  }
+  window.DriveApp = { createFolder: n => Folder(n), getFolderById: id => Folder(id) };
+
+  // google.script.run → เรียกฟังก์ชันใน Code.gs โดยตรง (ส่งผ่าน JSON เหมือนของจริง)
+  function runner(ok, fail) {
+    return new Proxy({}, { get(_, fn) {
+      if (fn === 'withSuccessHandler') return h => runner(h, fail);
+      if (fn === 'withFailureHandler') return h => runner(ok, h);
+      return (...args) => setTimeout(() => {
+        try { const r = window[fn](...JSON.parse(JSON.stringify(args))); ok && ok(r === undefined ? r : JSON.parse(JSON.stringify(r))); }
+        catch (e) { console.error(e); fail && fail(e); }
+      }, 150);
+    } });
+  }
+  window.google = { script: { get run() { return runner(); } } };
+
+  // ครั้งแรก: ติดตั้ง + นำเข้าข้อมูลเดิม
+  window.__previewInit = function () {
+    if (!db.props.ADMIN_HASH) { setup(); importLegacyData(); }
+  };
+})();
+
+</script>
+<script>
+/**
+ * ระบบบันทึกการอบรมพัฒนาทักษะดิจิทัล
+ * Google Apps Script + Google Sheets (ใช้ Spreadsheet เป็นฐานข้อมูล, Google Drive เก็บไฟล์ใบประกาศฯ)
+ *
+ * ติดตั้ง: ดู README.md  (สรุป: วางไฟล์ → รัน setup() → รัน importLegacyData() (ถ้าต้องการ) → Deploy เป็น Web app)
+ */
+
+// ---------------------------------------------------------------------------
+// โครงสร้างตาราง (1 ตาราง = 1 ชีต, แถวแรกเป็นหัวคอลัมน์)
+// ---------------------------------------------------------------------------
+const TABLES = {
+  prefixes:    { sheet: 'M_คำนำหน้า',          cols: ['id', 'name', 'sort', 'active'] },
+  departments: { sheet: 'M_สังกัด',             cols: ['id', 'name', 'sort', 'active'] },
+  positions:   { sheet: 'M_ตำแหน่ง',            cols: ['id', 'name', 'sort', 'active'] },
+  staffTypes:  { sheet: 'M_ประเภทเจ้าหน้าที่',     cols: ['id', 'name', 'sort', 'active'] },
+  providers:   { sheet: 'M_หน่วยงานผู้จัด',       cols: ['id', 'name', 'fullName', 'sort', 'active'] },
+  formats:     { sheet: 'M_รูปแบบการอบรม',       cols: ['id', 'name', 'sort', 'active'] },
+  categories:  { sheet: 'M_หมวดหมู่หลักสูตร',     cols: ['id', 'name', 'sort', 'active'] },
+  courses:     { sheet: 'M_หลักสูตร',            cols: ['id', 'name', 'providerId', 'hours', 'categoryId', 'active', 'pending'] },
+  employees:   { sheet: 'บุคลากร',              cols: ['id', 'prefixId', 'name', 'positionId', 'staffTypeId', 'departmentId', 'email', 'active'] },
+  trainings:   { sheet: 'บันทึกการอบรม',         cols: ['id', 'employeeId', 'courseId', 'providerId', 'formatId', 'startDate', 'endDate', 'hours', 'certUrl', 'note', 'createdAt', 'updatedAt'] }
+};
+
+// คอลัมน์ที่อ้างอิงไปยังตารางอื่น (ใช้ตอนตรวจก่อนลบ และตอน "รวมรายการซ้ำ")
+const REFS = {
+  prefixes:    [['employees', 'prefixId']],
+  positions:   [['employees', 'positionId']],
+  staffTypes:  [['employees', 'staffTypeId']],
+  departments: [['employees', 'departmentId']],
+  providers:   [['courses', 'providerId'], ['trainings', 'providerId']],
+  formats:     [['trainings', 'formatId']],
+  categories:  [['courses', 'categoryId']],
+  courses:     [['trainings', 'courseId']],
+  employees:   [['trainings', 'employeeId']]
+};
+
+const MASTER_TABLES = ['prefixes', 'departments', 'positions', 'staffTypes', 'providers', 'formats', 'categories', 'courses', 'employees'];
+const MAX_FILE_MB = 2;
+// ID ของ Google Sheet ที่ใช้เป็นฐานข้อมูล (ตัวอักษรระหว่าง /d/ และ /edit ใน URL ของชีต)
+// เว้นว่างได้ถ้าสร้างโปรเจกต์จากเมนู ส่วนขยาย → Apps Script ในชีต (โปรเจกต์ผูกกับชีตอยู่แล้ว)
+const SPREADSHEET_ID = '1DPwtmRPYNRRY3J6ox49mHBkUwSJnKUUWduyf_C9Hm2E';
+const REPORT_SHEET = 'รายงานการอบรม';
+const TH_MONTHS = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const ADMIN_SESSION_SEC = 6 * 60 * 60;
+const MAX_LOGIN_FAILS = 5;          // ใส่รหัสผิดได้กี่ครั้งก่อนถูกล็อก
+const LOGIN_LOCK_SEC = 15 * 60;     // ระยะเวลาล็อก (วินาที)
+const MIN_PASSWORD_LEN = 8;
+
+// ---------------------------------------------------------------------------
+// Web app
+// ---------------------------------------------------------------------------
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Index')
+    .setTitle(getSetting_('appTitle') || 'ระบบบันทึกการอบรมพัฒนาทักษะดิจิทัล')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+/** เมนูในชีต — ใช้ติดตั้งและดูแลระบบได้โดยไม่ต้องเปิด Apps Script editor */
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu('ระบบบันทึกการอบรม')
+    .addItem('1) ติดตั้ง / ตรวจสอบโครงสร้างชีต', 'setup')
+    .addItem('2) นำเข้าข้อมูลจากชีตเดิม', 'importLegacyData')
+    .addSeparator()
+    .addItem('อัปเดตแท็บรายงาน', 'refreshReport')
+    .addItem('รีเซ็ตรหัสผู้ดูแลเป็น admin1234', 'resetAdminPassword')
+    .addToUi();
+}
+
+function refreshReport() { refreshReportSheet_(); notify_('อัปเดตแท็บ "' + REPORT_SHEET + '" เรียบร้อย'); }
+
+/** ลืมรหัสผู้ดูแล — รันจากเมนูในชีต หรือเลือกฟังก์ชันนี้แล้วกด Run ใน Apps Script editor (เฉพาะเจ้าของสคริปต์) */
+function resetAdminPassword() {
+  PropertiesService.getScriptProperties().setProperty('ADMIN_HASH', hash_('admin1234'));
+  bumpSessionVersion_();
+  notify_('รีเซ็ตรหัสผู้ดูแลเป็น admin1234 แล้ว\nกรุณาเข้าสู่ระบบแล้วเปลี่ยนรหัสทันที: ผู้ดูแลระบบ → ตั้งค่าระบบ');
+}
+
+// ---------------------------------------------------------------------------
+// ติดตั้งครั้งแรก — รันจาก Apps Script editor
+// ---------------------------------------------------------------------------
+function setup() {
+  const ss = ss_();
+  Object.keys(TABLES).forEach(function (key) {
+    const t = TABLES[key];
+    let sh = ss.getSheetByName(t.sheet);
+    if (!sh) sh = ss.insertSheet(t.sheet);
+    sh.getRange(1, 1, 1, t.cols.length).setValues([t.cols]).setFontWeight('bold').setBackground('#dbe6f3');
+    sh.setFrozenRows(1);
+    // เก็บทุกคอลัมน์เป็นข้อความ เพื่อไม่ให้ Sheets แปลงวันที่/ตัวเลขเอง
+    sh.getRange(1, 1, sh.getMaxRows(), t.cols.length).setNumberFormat('@');
+    protectSheet_(sh, 'ข้อมูลของระบบ — กรุณาแก้ไขผ่าน Web app (เมนูผู้ดูแลระบบ)');
+  });
+  // ลบแท็บว่างที่ติดมากับไฟล์ใหม่ (เช่น "ชีต1") — แท็บที่มีข้อมูลจะไม่ถูกแตะ
+  const ours = Object.keys(TABLES).map(function (k) { return TABLES[k].sheet; }).concat([REPORT_SHEET]);
+  ss.getSheets().forEach(function (sh) {
+    if (ours.indexOf(sh.getName()) < 0 && sh.getLastRow() === 0 && ss.getSheets().length > 1) ss.deleteSheet(sh);
+  });
+
+  ensureSettings_();
+
+  // ข้อมูลหลักตั้งต้น (เพิ่มเฉพาะเมื่อตารางยังว่าง)
+  seedIfEmpty_('prefixes', ['นาย', 'นาง', 'นางสาว', 'ว่าที่ร้อยตรี', 'ดร.'].map(nameRow_));
+  seedIfEmpty_('staffTypes', ['ข้าราชการ', 'พนักงานราชการ', 'ลูกจ้างประจำ', 'พนักงานจ้างเหมาบริการ'].map(nameRow_));
+  seedIfEmpty_('formats', ['ออนไลน์', 'ออนไซต์', 'ผสมผสาน (Hybrid)'].map(nameRow_));
+  seedIfEmpty_('categories', ['AI', 'Cybersecurity', 'Data', 'Digital Literacy'].map(nameRow_));
+  seedIfEmpty_('departments', ['ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร'].map(nameRow_));
+  refreshReportSheet_();
+  notify_('ติดตั้งเรียบร้อย\n\nรหัสผู้ดูแลเริ่มต้น = admin1234\nกรุณาเปลี่ยนในหน้าเว็บ: ผู้ดูแลระบบ → ตั้งค่าระบบ\n\nขั้นต่อไป: เมนู "2) นำเข้าข้อมูลจากชีตเดิม" (ถ้าต้องการ) แล้ว Deploy เป็น Web app');
+}
+
+/**
+ * ค่าตั้งต้นของระบบ (เก็บใน Script Properties ของโปรเจกต์)
+ * เรียกทั้งตอนติดตั้งและตอนใช้งาน เพราะโปรเจกต์ที่ Deploy เป็น Web app
+ * อาจไม่ใช่โปรเจกต์เดียวกับที่กดเมนูติดตั้งในชีต
+ */
+function ensureSettings_() {
+  const props = PropertiesService.getScriptProperties();
+  if (!props.getProperty('ADMIN_HASH')) props.setProperty('ADMIN_HASH', hash_('admin1234'));
+  if (!props.getProperty('appTitle')) props.setProperty('appTitle', 'ระบบบันทึกการอบรมพัฒนาทักษะดิจิทัล');
+  if (!props.getProperty('orgName')) props.setProperty('orgName', 'ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร กรมการค้าต่างประเทศ');
+  if (!props.getProperty('CERT_FOLDER_ID')) {
+    const folder = DriveApp.createFolder('ใบประกาศนียบัตรการอบรม');
+    props.setProperty('CERT_FOLDER_ID', folder.getId());
+  }
+}
+
+function nameRow_(name, i) { return { name: name, sort: String(i + 1), active: 'TRUE' }; }
+
+function seedIfEmpty_(table, rows) {
+  if (readTable_(table).length) return;
+  rows.forEach(function (r) { insert_(table, r); });
+}
+
+/**
+ * นำเข้าข้อมูลจากชีตเดิม (ไฟล์ Seed.gs) — รันครั้งเดียวหลัง setup()
+ * ไม่สร้างซ้ำ: ถ้าชื่อมีอยู่แล้วจะใช้ของเดิม
+ */
+function importLegacyData() {
+  const seed = LEGACY_SEED;
+  const lock = LockService.getScriptLock(); lock.waitLock(30000);
+  try {
+    const deptId = findOrCreate_('departments', { name: seed.department });
+    const typeId = findOrCreate_('staffTypes', { name: 'ข้าราชการ' });
+    const empIds = seed.employees.map(function (e) {
+      return findOrCreate_('employees', {
+        name: e.name,
+        prefixId: e.prefix ? findOrCreate_('prefixes', { name: e.prefix }) : '',
+        positionId: findOrCreate_('positions', { name: e.position }),
+        staffTypeId: typeId, departmentId: deptId, active: 'TRUE'
+      });
+    });
+    let n = 0;
+    seed.trainings.forEach(function (t) {
+      const provId = t.provider ? findOrCreate_('providers', { name: t.provider, fullName: seed.providerFull[t.provider] || t.provider }) : '';
+      const courseId = findOrCreate_('courses', { name: t.course, providerId: provId, active: 'TRUE', pending: 'FALSE' });
+      const fmtId = t.format ? findOrCreate_('formats', { name: t.format }) : '';
+      const exists = readTable_('trainings').some(function (r) {
+        return r.employeeId === empIds[t.emp] && r.courseId === courseId && r.startDate === t.start;
+      });
+      if (exists) return;
+      insert_('trainings', {
+        employeeId: empIds[t.emp], courseId: courseId, providerId: provId, formatId: fmtId,
+        startDate: t.start, endDate: t.end || t.start, note: 'นำเข้าจากชีตเดิม'
+      });
+      n++;
+    });
+    refreshReportSheet_();
+    notify_('นำเข้าบุคลากร ' + empIds.length + ' คน, รายการอบรมใหม่ ' + n + ' รายการ');
+  } finally { lock.releaseLock(); }
+}
+
+function findOrCreate_(table, rec) {
+  const key = normKey_(rec.name);
+  const hit = readTable_(table).filter(function (r) { return normKey_(r.name) === key; })[0];
+  if (hit) return hit.id;
+  if (rec.active === undefined) rec.active = 'TRUE';
+  return insert_(table, rec).id;
+}
+
+// ---------------------------------------------------------------------------
+// API สำหรับผู้ใช้ทั่วไป
+// ---------------------------------------------------------------------------
+function getBootstrap() {
+  const out = { settings: { appTitle: getSetting_('appTitle'), orgName: getSetting_('orgName') } };
+  MASTER_TABLES.concat(['trainings']).forEach(function (t) { out[t] = readTable_(t); });
+  return out;
+}
+
+/**
+ * บันทึกการอบรม (เพิ่มได้หลายหลักสูตรในครั้งเดียว)
+ * payload = { employeeId, items: [{ courseId | newCourseName, providerId, formatId, startDate, endDate, hours, note, file: {name, type, data(base64)} }] }
+ */
+function addTrainings(payload) {
+  if (!payload || !payload.employeeId) throw new Error('กรุณาเลือกชื่อบุคลากร');
+  if (!payload.items || !payload.items.length) throw new Error('กรุณาเพิ่มอย่างน้อย 1 หลักสูตร');
+  const emp = readTable_('employees').filter(function (e) { return e.id === payload.employeeId; })[0];
+  if (!emp) throw new Error('ไม่พบข้อมูลบุคลากร');
+
+  const lock = LockService.getScriptLock(); lock.waitLock(30000);
+  try {
+    // ตรวจทุกรายการก่อนบันทึก เพื่อไม่ให้บันทึกไปครึ่งเดียวแล้วผู้ใช้กดซ้ำจนข้อมูลซ้ำ
+    const ids = {};
+    ['courses', 'providers', 'formats'].forEach(function (t) {
+      ids[t] = {}; readTable_(t).forEach(function (r) { ids[t][r.id] = true; });
+    });
+    payload.items.forEach(function (it, i) {
+      const no = 'หลักสูตรที่ ' + (i + 1) + ': ';
+      if (!it.courseId && !(it.newCourseName && String(it.newCourseName).trim())) throw new Error(no + 'กรุณาระบุชื่อหลักสูตร');
+      if (it.courseId && !ids.courses[it.courseId]) throw new Error(no + 'ไม่พบหลักสูตรในระบบ');
+      if (it.providerId && !ids.providers[it.providerId]) throw new Error(no + 'ไม่พบหน่วยงานผู้จัดในระบบ');
+      if (it.formatId && !ids.formats[it.formatId]) throw new Error(no + 'ไม่พบรูปแบบการอบรมในระบบ');
+      if (!it.startDate) throw new Error(no + 'กรุณาระบุวันที่อบรม');
+      if (!isIsoDate_(it.startDate)) throw new Error(no + 'รูปแบบวันที่อบรมไม่ถูกต้อง');
+      if (it.endDate) {
+        if (!isIsoDate_(it.endDate)) throw new Error(no + 'รูปแบบวันที่สิ้นสุดไม่ถูกต้อง');
+        if (it.endDate < it.startDate) throw new Error(no + 'วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม');
+      }
+      if (!isValidHours_(it.hours)) throw new Error(no + 'จำนวนชั่วโมงต้องเป็นตัวเลขตั้งแต่ 0 ถึง 999');
+      if (it.file && it.file.data) checkCertificate_(it.file);
+    });
+    const saved = payload.items.map(function (it) {
+      let courseId = it.courseId;
+      if (!courseId) {
+        if (!it.newCourseName || !String(it.newCourseName).trim()) throw new Error('กรุณาระบุชื่อหลักสูตร');
+        // หลักสูตรที่ผู้ใช้พิมพ์เอง → เพิ่มเป็น "รอตรวจสอบ" ให้ผู้ดูแลยืนยัน/รวมรายการ
+        courseId = findOrCreate_('courses', { name: String(it.newCourseName).trim(), providerId: it.providerId || '', active: 'TRUE', pending: 'TRUE' });
+      }
+      if (!it.startDate) throw new Error('กรุณาระบุวันที่อบรม');
+      const certUrl = it.file && it.file.data ? saveCertificate_(it.file, emp, courseId, it.startDate) : '';
+      return insert_('trainings', {
+        employeeId: emp.id, courseId: courseId, providerId: it.providerId || '', formatId: it.formatId || '',
+        startDate: it.startDate, endDate: it.endDate || it.startDate, hours: hoursStr_(it.hours),
+        certUrl: certUrl, note: String(it.note || '').slice(0, 500)
+      });
+    });
+    refreshReportSheet_();
+    return { saved: saved, data: getBootstrap() };
+  } finally { lock.releaseLock(); }
+}
+
+function checkCertificate_(file) {
+  const okTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+  if (okTypes.indexOf(file.type) < 0) throw new Error('รองรับเฉพาะไฟล์ PDF / JPG / PNG');
+  // base64 → ขนาดจริง ≈ ความยาว × 3/4 (ตรวจก่อนถอดรหัสเพื่อไม่เปลืองหน่วยความจำ)
+  if (typeof file.data !== 'string' || !/^[A-Za-z0-9+\/=\s]+$/.test(file.data.slice(0, 64))) throw new Error('ข้อมูลไฟล์ไม่ถูกต้อง');
+  if (file.data.length * 0.75 > MAX_FILE_MB * 1024 * 1024 * 1.01) throw new Error('ไฟล์ต้องมีขนาดไม่เกิน ' + MAX_FILE_MB + ' MB');
+  // ตรวจลายเซ็นไฟล์ (magic bytes) ให้ตรงกับชนิดที่แจ้งมา ไม่เชื่อ MIME จากฝั่ง client อย่างเดียว
+  const head = Utilities.base64Decode(file.data.replace(/\s+/g, '').slice(0, 16)).map(function (b) { return b & 0xff; });
+  const sig = {
+    'application/pdf': [0x25, 0x50, 0x44, 0x46],
+    'image/jpeg': [0xFF, 0xD8, 0xFF],
+    'image/png': [0x89, 0x50, 0x4E, 0x47]
+  }[file.type];
+  const match = sig.every(function (b, i) { return head[i] === b; });
+  if (!match) throw new Error('เนื้อหาไฟล์ไม่ตรงกับชนิดไฟล์ที่เลือก (รองรับ PDF / JPG / PNG)');
+}
+
+function saveCertificate_(file, emp, courseId, startDate) {
+  checkCertificate_(file);
+  const bytes = Utilities.base64Decode(file.data);
+  if (bytes.length > MAX_FILE_MB * 1024 * 1024) throw new Error('ไฟล์ต้องมีขนาดไม่เกิน ' + MAX_FILE_MB + ' MB');
+  // เก็บแยกโฟลเดอร์ตามปีงบประมาณ ตั้งชื่อไฟล์ ชื่อ_หลักสูตร_วันที่อบรม
+  const course = readTable_('courses').filter(function (c) { return c.id === courseId; })[0];
+  const safe = function (s, n) { return String(s || '').replace(/[\\/:*?"<>|#%]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n); };
+  // นามสกุลกำหนดจากชนิดไฟล์ที่ตรวจแล้ว ไม่ใช้ชื่อไฟล์จากผู้ใช้
+  const ext = { 'application/pdf': '.pdf', 'image/jpeg': '.jpg', 'image/png': '.png' }[file.type];
+  const name = safe(emp.name, 60) + '_' + safe(course ? course.name : 'หลักสูตร', 80) + '_' + startDate + ext;
+  return certFolder_(fyOf_(startDate)).createFile(Utilities.newBlob(bytes, file.type, name)).getUrl();
+}
+
+// ---------------------------------------------------------------------------
+// API ผู้ดูแลระบบ (ต้องมี token จาก adminLogin)
+// ---------------------------------------------------------------------------
+function adminLogin(password) {
+  ensureSettings_();
+  const cache = CacheService.getScriptCache();
+  const fails = Number(cache.get('login_fails') || 0);
+  if (fails >= MAX_LOGIN_FAILS) throw new Error('ใส่รหัสผ่านผิดหลายครั้ง ระบบล็อกชั่วคราว กรุณารอ ' + Math.round(LOGIN_LOCK_SEC / 60) + ' นาทีแล้วลองใหม่');
+  if (hash_(String(password || '')) !== getSetting_('ADMIN_HASH')) {
+    cache.put('login_fails', String(fails + 1), LOGIN_LOCK_SEC);
+    throw new Error('รหัสผ่านไม่ถูกต้อง');
+  }
+  cache.put('login_fails', '0', 1);
+  const token = Utilities.getUuid();
+  cache.put('adm_' + token, sessionVersion_(), ADMIN_SESSION_SEC);
+  return token;
+}
+
+/** เลขรุ่นของ session — เพิ่มค่าเมื่อเปลี่ยน/รีเซ็ตรหัส เพื่อให้ token เดิมทั้งหมดใช้ไม่ได้ */
+function sessionVersion_() { return getSetting_('SESSION_VER') || '0'; }
+function bumpSessionVersion_() {
+  PropertiesService.getScriptProperties().setProperty('SESSION_VER', String(Number(sessionVersion_()) + 1));
+}
+
+function adminSave(token, table, rec) {
+  requireAdmin_(token);
+  if (!TABLES[table]) throw new Error('ไม่รู้จักตาราง ' + table);
+  const lock = LockService.getScriptLock(); lock.waitLock(30000);
+  try {
+    if (table !== 'trainings') {
+      if (!rec.name || !String(rec.name).trim()) throw new Error('กรุณากรอกชื่อ');
+      const key = normKey_(rec.name);
+      const dup = readTable_(table).some(function (r) { return r.id !== rec.id && normKey_(r.name) === key; });
+      if (dup) throw new Error('มีชื่อนี้อยู่แล้ว: ' + rec.name);
+    }
+    if (table === 'trainings') {
+      if (rec.startDate && !isIsoDate_(rec.startDate)) throw new Error('รูปแบบวันที่เริ่มไม่ถูกต้อง');
+      if (rec.endDate && !isIsoDate_(rec.endDate)) throw new Error('รูปแบบวันที่สิ้นสุดไม่ถูกต้อง');
+      if (rec.startDate && rec.endDate && rec.endDate < rec.startDate) throw new Error('วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม');
+      if (!isValidHours_(rec.hours)) throw new Error('จำนวนชั่วโมงต้องเป็นตัวเลขตั้งแต่ 0 ถึง 999');
+      if (rec.hours !== undefined) rec.hours = hoursStr_(rec.hours);
+      if (rec.certUrl && !/^https:\/\//i.test(rec.certUrl)) throw new Error('ลิงก์ใบประกาศฯ ต้องขึ้นต้นด้วย https://');
+    }
+    if (rec.id) update_(table, rec); else insert_(table, rec);
+    refreshReportSheet_();
+    return getBootstrap();
+  } finally { lock.releaseLock(); }
+}
+
+function adminDelete(token, table, id) {
+  requireAdmin_(token);
+  if (!TABLES[table]) throw new Error('ไม่รู้จักตาราง ' + table);
+  const lock = LockService.getScriptLock(); lock.waitLock(30000);
+  try {
+    const used = countRefs_(table, id);
+    if (used) throw new Error('ลบไม่ได้ เพราะมีข้อมูลอ้างอิงอยู่ ' + used + ' รายการ — ใช้ "ปิดใช้งาน" หรือ "รวมรายการ" แทน');
+    remove_(table, id);
+    refreshReportSheet_();
+    return getBootstrap();
+  } finally { lock.releaseLock(); }
+}
+
+/** รวมรายการซ้ำ: ย้ายการอ้างอิงทั้งหมดจาก fromId → toId แล้วลบ fromId */
+function adminMerge(token, table, fromId, toId) {
+  requireAdmin_(token);
+  if (MASTER_TABLES.indexOf(table) < 0) throw new Error('ตารางนี้ไม่รองรับการรวมรายการ');
+  if (!fromId || !toId || fromId === toId) throw new Error('เลือกรายการปลายทางไม่ถูกต้อง');
+  const lock = LockService.getScriptLock(); lock.waitLock(30000);
+  try {
+    const rows = readTable_(table);
+    const hasId = function (id) { return rows.some(function (r) { return r.id === id; }); };
+    if (!hasId(fromId) || !hasId(toId)) throw new Error('ไม่พบรายการที่ต้องการรวม');
+    (REFS[table] || []).forEach(function (ref) { relink_(ref[0], ref[1], fromId, toId); });
+    remove_(table, fromId);
+    refreshReportSheet_();
+    return getBootstrap();
+  } finally { lock.releaseLock(); }
+}
+
+/** เปลี่ยนค่าอ้างอิงในคอลัมน์ col จาก fromId เป็น toId (อ่าน/เขียนทั้งคอลัมน์ครั้งเดียว) */
+function relink_(table, col, fromId, toId) {
+  const sh = sheet_(table), last = sh.getLastRow();
+  if (last < 2) return;
+  const range = sh.getRange(2, TABLES[table].cols.indexOf(col) + 1, last - 1, 1);
+  const vals = range.getValues();
+  let changed = false;
+  vals.forEach(function (row) { if (String(row[0]) === fromId) { row[0] = toId; changed = true; } });
+  if (changed) range.setValues(vals);
+}
+
+/**
+ * เพิ่มข้อมูลหลักหลายรายการพร้อมกัน (วางจาก Excel ได้ บรรทัดละ 1 รายการ, คั่นคอลัมน์ด้วย Tab หรือ |)
+ *  employees : ชื่อ-นามสกุล (มีคำนำหน้าได้) | ตำแหน่ง | สังกัด | ประเภทเจ้าหน้าที่
+ *  courses   : ชื่อหลักสูตร | หน่วยงานผู้จัด (ชื่อย่อ) | จำนวนชั่วโมง
+ *  providers : ชื่อย่อ | ชื่อเต็ม
+ *  อื่น ๆ     : ชื่อ
+ */
+function adminBulkAdd(token, table, lines) {
+  requireAdmin_(token);
+  if (!TABLES[table] || table === 'trainings') throw new Error('ตารางนี้ไม่รองรับการเพิ่มหลายรายการ');
+  const lock = LockService.getScriptLock(); lock.waitLock(30000);
+  try {
+    let added = 0, skipped = 0;
+    (lines || []).forEach(function (line) {
+      const p = String(line).split(/\t|\|/).map(function (s) { return s.trim(); });
+      if (!p[0]) return;
+      let rec;
+      if (table === 'employees') {
+        const sp = splitPrefix_(p[0]);
+        rec = {
+          name: sp.name,
+          prefixId: sp.prefix ? findOrCreate_('prefixes', { name: sp.prefix }) : '',
+          positionId: p[1] ? findOrCreate_('positions', { name: p[1] }) : '',
+          departmentId: p[2] ? findOrCreate_('departments', { name: p[2] }) : '',
+          staffTypeId: p[3] ? findOrCreate_('staffTypes', { name: p[3] }) : ''
+        };
+      } else if (table === 'courses') {
+        rec = { name: p[0], providerId: p[1] ? findOrCreate_('providers', { name: p[1], fullName: p[1] }) : '', hours: p[2] || '', pending: 'FALSE' };
+      } else if (table === 'providers') {
+        rec = { name: p[0], fullName: p[1] || p[0] };
+      } else {
+        rec = { name: p[0] };
+      }
+      rec.active = 'TRUE';
+      const key = normKey_(rec.name);
+      if (readTable_(table).some(function (r) { return normKey_(r.name) === key; })) { skipped++; return; }
+      insert_(table, rec); added++;
+    });
+    refreshReportSheet_();
+    return { added: added, skipped: skipped, data: getBootstrap() };
+  } finally { lock.releaseLock(); }
+}
+
+/** แยกคำนำหน้าออกจากชื่อ ตามรายการใน M_คำนำหน้า (ยาวสุดก่อน เช่น "นางสาว" ก่อน "นาง") */
+function splitPrefix_(full) {
+  full = String(full).trim();
+  const names = readTable_('prefixes').map(function (r) { return r.name; })
+    .sort(function (a, b) { return b.length - a.length; });
+  for (let i = 0; i < names.length; i++) {
+    if (names[i] && full.indexOf(names[i]) === 0) return { prefix: names[i], name: full.slice(names[i].length).trim() };
+  }
+  return { prefix: '', name: full };
+}
+
+function adminSaveSettings(token, s) {
+  requireAdmin_(token);
+  const props = PropertiesService.getScriptProperties();
+  let passwordChanged = false;
+  if (s.appTitle) props.setProperty('appTitle', s.appTitle);
+  if (s.orgName) props.setProperty('orgName', s.orgName);
+  if (s.newPassword) {
+    if (String(s.newPassword).length < MIN_PASSWORD_LEN) throw new Error('รหัสผ่านใหม่ต้องมีอย่างน้อย ' + MIN_PASSWORD_LEN + ' ตัวอักษร');
+    if (String(s.newPassword) === 'admin1234') throw new Error('ห้ามใช้รหัสเริ่มต้น กรุณาตั้งรหัสใหม่');
+    props.setProperty('ADMIN_HASH', hash_(s.newPassword));
+    bumpSessionVersion_();
+    passwordChanged = true;
+  }
+  const out = getBootstrap();
+  if (passwordChanged) out.newToken = adminLogin(s.newPassword);  // ให้ผู้ที่เปลี่ยนรหัสอยู่ในระบบต่อได้
+  return out;
+}
+
+function requireAdmin_(token) {
+  if (!token || CacheService.getScriptCache().get('adm_' + token) !== sessionVersion_()) throw new Error('หมดเวลาการเข้าสู่ระบบผู้ดูแล กรุณาเข้าสู่ระบบใหม่');
+}
+
+function countRefs_(table, id) {
+  return (REFS[table] || []).reduce(function (n, ref) {
+    return n + readTable_(ref[0]).filter(function (r) { return r[ref[1]] === id; }).length;
+  }, 0);
+}
+
+// ---------------------------------------------------------------------------
+// ชั้นข้อมูล (Sheets)
+// ---------------------------------------------------------------------------
+function sheet_(table) {
+  const sh = ss_().getSheetByName(TABLES[table].sheet);
+  if (!sh) throw new Error('ไม่พบชีต "' + TABLES[table].sheet + '" — กรุณารัน setup() ก่อน');
+  return sh;
+}
+
+function readTable_(table) {
+  const cols = TABLES[table].cols;
+  const sh = sheet_(table);
+  const last = sh.getLastRow();
+  if (last < 2) return [];
+  return sh.getRange(2, 1, last - 1, cols.length).getValues()
+    .filter(function (row) { return row[0] !== ''; })
+    .map(function (row) {
+      const o = {};
+      cols.forEach(function (c, i) {
+        const v = row[i];
+        o[c] = v instanceof Date ? Utilities.formatDate(v, 'Asia/Bangkok', 'yyyy-MM-dd') : String(v);
+      });
+      return o;
+    });
+}
+
+function insert_(table, rec) {
+  const cols = TABLES[table].cols;
+  const now = Utilities.formatDate(new Date(), 'Asia/Bangkok', "yyyy-MM-dd'T'HH:mm:ss");
+  rec = Object.assign({}, rec, { id: Utilities.getUuid().slice(0, 8) });
+  if (cols.indexOf('createdAt') >= 0) { rec.createdAt = now; rec.updatedAt = now; }
+  sheet_(table).appendRow(cols.map(function (c) { return rec[c] === undefined || rec[c] === null ? '' : String(rec[c]); }));
+  return rec;
+}
+
+function update_(table, rec) {
+  const cols = TABLES[table].cols;
+  const sh = sheet_(table);
+  const row = findRow_(sh, rec.id);
+  if (!row) throw new Error('ไม่พบรายการที่ต้องการแก้ไข');
+  const cur = sh.getRange(row, 1, 1, cols.length).getValues()[0];
+  if (cols.indexOf('updatedAt') >= 0) rec.updatedAt = Utilities.formatDate(new Date(), 'Asia/Bangkok', "yyyy-MM-dd'T'HH:mm:ss");
+  const next = cols.map(function (c, i) {
+    if (c === 'id' || c === 'createdAt') return cur[i];
+    return rec[c] === undefined ? cur[i] : String(rec[c]);
+  });
+  sh.getRange(row, 1, 1, cols.length).setValues([next]);
+}
+
+function remove_(table, id) {
+  const sh = sheet_(table);
+  const row = findRow_(sh, id);
+  if (row) sh.deleteRow(row);
+}
+
+function findRow_(sh, id) {
+  const last = sh.getLastRow();
+  if (last < 2) return 0;
+  const ids = sh.getRange(2, 1, last - 1, 1).getValues();
+  for (let i = 0; i < ids.length; i++) if (String(ids[i][0]) === String(id)) return i + 2;
+  return 0;
+}
+
+// ---------------------------------------------------------------------------
+// แท็บรายงาน (อ่านได้ทันทีในชีต — สร้างใหม่ทุกครั้งที่มีการบันทึก/แก้ไข)
+// ---------------------------------------------------------------------------
+function refreshReportSheet_() {
+  const ss = ss_();
+  const sh = ss.getSheetByName(REPORT_SHEET) || ss.insertSheet(REPORT_SHEET, 0);
+  const name = {};
+  ['prefixes', 'departments', 'positions', 'staffTypes', 'providers', 'formats', 'courses'].forEach(function (t) {
+    name[t] = {}; readTable_(t).forEach(function (r) { name[t][r.id] = r.name; });
+  });
+  const emps = readTable_('employees'), emp = {}, order = {};
+  emps.forEach(function (e, i) { emp[e.id] = e; order[e.id] = i; });
+  const trs = readTable_('trainings').filter(function (t) { return emp[t.employeeId]; });
+  trs.sort(function (a, b) {
+    return (fyOf_(b.startDate) - fyOf_(a.startDate)) || (order[a.employeeId] - order[b.employeeId]) || a.startDate.localeCompare(b.startDate);
+  });
+  const head = ['ปีงบประมาณ', 'คำนำหน้า', 'ชื่อ - นามสกุล', 'ตำแหน่ง', 'สังกัด', 'ประเภทเจ้าหน้าที่', 'หลักสูตรที่ผ่านการอบรม',
+    'หน่วยงานผู้จัด', 'รูปแบบการอบรม', 'วันที่เริ่ม', 'วันที่สิ้นสุด', 'จำนวนชั่วโมง', 'ใบประกาศนียบัตร', 'บันทึกเมื่อ'];
+  const rows = trs.map(function (t) {
+    const e = emp[t.employeeId];
+    return [String(fyOf_(t.startDate) || 'ไม่ระบุวันที่'), name.prefixes[e.prefixId] || '', e.name, name.positions[e.positionId] || '',
+      name.departments[e.departmentId] || '', name.staffTypes[e.staffTypeId] || '', name.courses[t.courseId] || '',
+      name.providers[t.providerId] || '', name.formats[t.formatId] || '', thDate_(t.startDate), thDate_(t.endDate),
+      t.hours, t.certUrl, String(t.createdAt).replace('T', ' ')];
+  });
+  sh.clearContents();
+  sh.getRange(1, 1, Math.max(rows.length + 1, 2), head.length).setNumberFormat('@');
+  sh.getRange(1, 1, 1, head.length).setValues([head]).setFontWeight('bold').setBackground('#dbe6f3');
+  if (rows.length) sh.getRange(2, 1, rows.length, head.length).setValues(rows);
+  sh.setFrozenRows(1);
+  protectSheet_(sh, 'แท็บนี้สร้างอัตโนมัติจากระบบ — การแก้ไขในแท็บนี้จะถูกเขียนทับ');
+}
+
+function protectSheet_(sh, msg) {
+  // แบบ "แจ้งเตือน" — ผู้แก้ไขยังแก้ได้ แต่จะมีคำเตือนก่อนแก้ข้อมูลด้วยมือ
+  if (sh.getProtections(SpreadsheetApp.ProtectionType.SHEET).length) return;
+  sh.protect().setDescription(msg).setWarningOnly(true);
+}
+
+function certFolder_(fy) {
+  ensureSettings_();
+  const root = DriveApp.getFolderById(getSetting_('CERT_FOLDER_ID'));
+  const label = 'ปีงบประมาณ ' + (fy || 'ไม่ระบุ');
+  const it = root.getFoldersByName(label);
+  return it.hasNext() ? it.next() : root.createFolder(label);
+}
+
+/** แสดงข้อความเป็นกล่องในชีต (เมื่อรันจากเมนู) หรือใน Log (เมื่อรันจาก editor) */
+function notify_(msg) {
+  Logger.log(msg);
+  try { SpreadsheetApp.getUi().alert(msg); } catch (e) { /* รันจาก editor/trigger */ }
+}
+
+// ---------------------------------------------------------------------------
+// utils
+// ---------------------------------------------------------------------------
+function ss_() {
+  return SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+
+// ---------------------------------------------------------------------------
+// utils (อื่น ๆ)
+// ---------------------------------------------------------------------------
+function fyOf_(iso) {
+  if (!iso) return 0;
+  const p = String(iso).split('-').map(Number);
+  return p[0] + 543 + (p[1] >= 10 ? 1 : 0);
+}
+
+function thDate_(iso) {
+  if (!iso) return '';
+  const p = String(iso).split('-').map(Number);
+  return p[2] + ' ' + TH_MONTHS[p[1] - 1] + ' ' + (p[0] + 543);
+}
+
+function isIsoDate_(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || ''));
+  if (!m) return false;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  if (y < 1900 || y > 2200 || mo < 1 || mo > 12 || d < 1) return false;
+  return d <= new Date(Date.UTC(y, mo, 0)).getUTCDate();
+}
+
+/** ชั่วโมง: ว่างได้ หรือเป็นตัวเลข 0–999 */
+function isValidHours_(h) {
+  if (h === undefined || h === null || String(h).trim() === '') return true;
+  const n = Number(h);
+  return isFinite(n) && n >= 0 && n <= 999;
+}
+function hoursStr_(h) { return (h === undefined || h === null || String(h).trim() === '') ? '' : String(Number(h)); }
+
+function getSetting_(k) { return PropertiesService.getScriptProperties().getProperty(k) || ''; }
+
+function hash_(s) {
+  const raw = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, 'dft-training:' + s, Utilities.Charset.UTF_8);
+  return raw.map(function (b) { return ('0' + (b & 0xff).toString(16)).slice(-2); }).join('');
+}
+
+/** คีย์สำหรับตรวจชื่อซ้ำ: ตัดช่องว่าง/เครื่องหมาย และตัวพิมพ์ */
+function normKey_(s) {
+  return String(s || '').toLowerCase().replace(/ํา/g, 'ำ').replace(/[\s:.\-–()]/g, '');
+}
+
+/**
+ * ข้อมูลจากชีตเดิม "ตั้งแต่วันที่ 1 ตุลาคม 2568 - 30 กันยายน 2569" (ปรับรูปแบบแล้ว)
+ * - แยกคำนำหน้าออกจากชื่อ, แปลงวันที่ไทยเป็น ค.ศ. (yyyy-mm-dd)
+ * - ตัดเลขลำดับหน้าชื่อหลักสูตร และรวมชื่อหลักสูตรที่เขียนต่างกันให้เป็นชื่อเดียว
+ * ใช้โดยฟังก์ชัน importLegacyData() ใน Code.gs
+ */
+const LEGACY_SEED = {
+ "employees": [
+  {
+   "prefix": "นาง",
+   "name": "สรารัศม์ ภัทรหิรัณย์คุณ",
+   "position": "ผู้อำนวยการศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร"
+  },
+  {
+   "prefix": "นาง",
+   "name": "ปัณณพร ยุติธรรมคุณา",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการพิเศษ"
+  },
+  {
+   "prefix": "นางสาว",
+   "name": "กฤษณา กุดั่น",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการพิเศษ"
+  },
+  {
+   "prefix": "นาย",
+   "name": "กังสทัศน์ รอบคอบ",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการพิเศษ"
+  },
+  {
+   "prefix": "นาง",
+   "name": "พรวดี แสงทับทิม",
+   "position": "นักวิชาการพาณิชย์ชำนาญการพิเศษ"
+  },
+  {
+   "prefix": "นาง",
+   "name": "กนกอร ไทยรัก",
+   "position": "นักวิชาการพาณิชย์ชำนาญการพิเศษ"
+  },
+  {
+   "prefix": "นางสาว",
+   "name": "พัชรินทร์ธร ดีสมจรนีย์",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นางสาว",
+   "name": "บุษกร ธีรนันทน์",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นางสาว",
+   "name": "พิไลพร พวงสมบัติ",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นางสาว",
+   "name": "รัตนา แสนสุข",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นางสาว",
+   "name": "วรากร คำมูล",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นางสาว",
+   "name": "วิจิตรา ตรีพลกุล",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นาย",
+   "name": "เชิง ชุมภู",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นาย",
+   "name": "เดชา ภาษี",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นาย",
+   "name": "คณุตม์ พึ่งเกษม",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นาย",
+   "name": "นริศร จินตวรรณ",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นาย",
+   "name": "มารุต เหล่าสิทธิบุญชัย",
+   "position": "นักวิชาการคอมพิวเตอร์ชำนาญการ"
+  },
+  {
+   "prefix": "นาย",
+   "name": "ลือชา ชูเชิด",
+   "position": "นักวิชาการพาณิชย์ชำนาญการ"
+  },
+  {
+   "prefix": "นาย",
+   "name": "สมภพ ชุ่มมณีกูล",
+   "position": "นักคอมพิวเตอร์"
+  },
+  {
+   "prefix": "",
+   "name": "อดิเทพ รอดพุก",
+   "position": "นักคอมพิวเตอร์"
+  },
+  {
+   "prefix": "นาง",
+   "name": "ปาริชา ดำรงวณิชย์",
+   "position": "เจ้าพนักงานธุรการชำนาญงาน"
+  },
+  {
+   "prefix": "นาง",
+   "name": "ประภารัตน์ รัตนสัมฤทธิ์",
+   "position": "เจ้าพนักงานธุรการชำนาญงาน"
+  },
+  {
+   "prefix": "นาย",
+   "name": "สิริชัย เผ่าพันธ์",
+   "position": "นักคอมพิวเตอร์"
+  },
+  {
+   "prefix": "นางสาว",
+   "name": "ภัคธนัช กลั่นเอม",
+   "position": "นักวิชาการพาณิชย์ชำนาญการ"
+  },
+  {
+   "prefix": "",
+   "name": "ฐิติมนต์ วิทูภาสกาญจน์",
+   "position": "นักวิชาการพาณิชย์ชำนาญการ"
+  }
+ ],
+ "trainings": [
+  {
+   "emp": 0,
+   "course": "ธรรมาภิบาลข้อมูล สำหรับผู้บริหารองค์กร",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-12",
+   "end": "2026-03-12"
+  },
+  {
+   "emp": 2,
+   "course": "ทักษะเอไอระดับพื้นฐาน (AI Basics)",
+   "provider": "TDGA",
+   "format": "",
+   "start": "",
+   "end": ""
+  },
+  {
+   "emp": 2,
+   "course": "การออกแบบและพัฒนา Data Visualization สำหรับผู้ปฏิบัติงาน (Data Visualization Design and Development for Practitioners)",
+   "provider": "BDE",
+   "format": "",
+   "start": "",
+   "end": ""
+  },
+  {
+   "emp": 3,
+   "course": "ความเข้าใจการบริหารความเสี่ยงและความปลอดภัยไซเบอร์ (Understanding Cybersecurity Risk Management)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-10",
+   "end": "2026-03-10"
+  },
+  {
+   "emp": 3,
+   "course": "AI Governance & Ethics หลักการจริยธรรม ธรรมาภิบาล และข้อกฎหมายในการประยุกต์ใช้ AI",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-13",
+   "end": "2026-03-13"
+  },
+  {
+   "emp": 4,
+   "course": "ความเข้าใจและใช้เทคโนโลยีดิจิทัล ทักษะที่จำเป็นสำหรับการปฏิบัติงาน",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-16",
+   "end": "2026-03-16"
+  },
+  {
+   "emp": 4,
+   "course": "การตรวจติดตามสำหรับการตรวจประเมินภายใน (Internal Audit) ให้สอดคล้องกับมาตรฐาน ISO/IEC 27001 : 2022",
+   "provider": "บริษัท เอเชี่ยน อินเทลลีเจนท์ อินฟอร์เมชั่น เทคโนโลยี จำกัด",
+   "format": "ออนไลน์",
+   "start": "2026-07-09",
+   "end": "2026-07-09"
+  },
+  {
+   "emp": 5,
+   "course": "ทักษะเอไอระดับพื้นฐาน (AI Basics)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-10-10",
+   "end": "2025-10-10"
+  },
+  {
+   "emp": 5,
+   "course": "AI for Everyone : ปัญญาประดิษฐ์เพื่ออนาคตของทุกคน",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-10-10",
+   "end": "2025-10-10"
+  },
+  {
+   "emp": 5,
+   "course": "การประยุกต์ใช้ความรู้ปัญญาประดิษฐ์ในการพัฒนาหุ่นยนต์สนทนา (Chatbot) เพื่อการบริการภาครัฐ",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-10-21",
+   "end": "2025-10-21"
+  },
+  {
+   "emp": 5,
+   "course": "หลักการสร้างภาพข้อมูลและการออกแบบ Dashboard อย่างมีประสิทธิภาพ",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-12",
+   "end": "2025-11-12"
+  },
+  {
+   "emp": 5,
+   "course": "กฎหมายคุ้มครองข้อมูลส่วนบุคคลสำหรับผู้ปฏิบัติงานภาครัฐ (PDPA for Government Officer)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-09-07",
+   "end": "2026-09-07"
+  },
+  {
+   "emp": 6,
+   "course": "AI Governance & Ethics หลักการจริยธรรม ธรรมาภิบาล และข้อกฎหมายในการประยุกต์ใช้ AI",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-27",
+   "end": "2025-11-27"
+  },
+  {
+   "emp": 6,
+   "course": "แนวทางในการนำเทคโนโลยีปัญญาประดิษฐ์มาใช้สำหรับบริการภาครัฐ (AI for Government Services)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-27",
+   "end": "2025-11-27"
+  },
+  {
+   "emp": 6,
+   "course": "AI for Everyone : ปัญญาประดิษฐ์เพื่ออนาคตของทุกคน",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-09-02",
+   "end": "2026-09-02"
+  },
+  {
+   "emp": 6,
+   "course": "กฎหมายคุ้มครองข้อมูลส่วนบุคคลสำหรับผู้ปฏิบัติงานภาครัฐ (PDPA for Government Officer)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-09-07",
+   "end": "2026-09-07"
+  },
+  {
+   "emp": 7,
+   "course": "การบริหารจัดการโครงการด้วยอไจล์ (Agile Project Management)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-07-13",
+   "end": "2026-07-13"
+  },
+  {
+   "emp": 7,
+   "course": "กฎหมายคุ้มครองข้อมูลส่วนบุคคลสำหรับผู้ปฏิบัติงานภาครัฐ (PDPA for Government Officer)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-12-12",
+   "end": "2025-12-12"
+  },
+  {
+   "emp": 8,
+   "course": "AI Governance & Ethics หลักการจริยธรรม ธรรมาภิบาล และข้อกฎหมายในการประยุกต์ใช้ AI",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-13",
+   "end": "2026-03-13"
+  },
+  {
+   "emp": 8,
+   "course": "การตรวจติดตามสำหรับการตรวจประเมินภายใน (Internal Audit) ให้สอดคล้องกับมาตรฐาน ISO/IEC 27001 : 2022",
+   "provider": "บริษัท เอเชี่ยน อินเทลลีเจนท์ อินฟอร์เมชั่น เทคโนโลยี จำกัด",
+   "format": "ออนไลน์",
+   "start": "2026-07-09",
+   "end": "2026-07-09"
+  },
+  {
+   "emp": 8,
+   "course": "การพัฒนา AI Chatbot เพื่อยกระดับองค์กรสู่ดิจิทัล",
+   "provider": "สดช.",
+   "format": "ออนไซต์",
+   "start": "2026-06-22",
+   "end": "2026-06-24"
+  },
+  {
+   "emp": 9,
+   "course": "ความรู้ความเข้าใจเกี่ยวกับปัญญาประดิษฐ์ (Artificial Intelligence) สำหรับบุคลากรภาครัฐทุกระดับ",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-13",
+   "end": "2025-11-13"
+  },
+  {
+   "emp": 9,
+   "course": "ความมั่นคงปลอดภัยทางไซเบอร์เบื้องต้น (Basic Cybersecurity Series)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-05",
+   "end": "2026-03-05"
+  },
+  {
+   "emp": 9,
+   "course": "การใช้เครื่องมือดิจิทัลเพื่อการทำงานภาครัฐ (Essential Digital Tools for Workplace)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-09-03",
+   "end": "2026-09-03"
+  },
+  {
+   "emp": 9,
+   "course": "การเปลี่ยนผ่านสู่องค์กรดิจิทัล (Digital Transformation)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-09-10",
+   "end": "2026-09-10"
+  },
+  {
+   "emp": 10,
+   "course": "กฎหมายคุ้มครองข้อมูลส่วนบุคคลสำหรับผู้ปฏิบัติงานภาครัฐ (PDPA for Government Officer)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-09-07",
+   "end": "2026-09-07"
+  },
+  {
+   "emp": 10,
+   "course": "การขับเคลื่อนด้วยข้อมูลสู่การเป็นรัฐบาลดิจิทัล (Data Driven Digital Government Transformation)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-11",
+   "end": "2026-03-11"
+  },
+  {
+   "emp": 10,
+   "course": "เรียนรู้ Prompt Engineering สู่ความเป็นผู้เชี่ยวชาญ AI",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-10-21",
+   "end": "2025-10-21"
+  },
+  {
+   "emp": 11,
+   "course": "ความเข้าใจการบริหารความเสี่ยงและความปลอดภัยไซเบอร์ (Understanding Cybersecurity Risk Management)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-06-29",
+   "end": "2026-06-29"
+  },
+  {
+   "emp": 11,
+   "course": "เรียนรู้ Prompt Engineering สู่ความเป็นผู้เชี่ยวชาญ AI",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-07-24",
+   "end": "2026-07-24"
+  },
+  {
+   "emp": 11,
+   "course": "แนวปฏิบัติกระบวนการทางดิจิทัลภาครัฐเพื่อสนับสนุนการดำเนินการตาม พรบ.ปฏิบัติราชการฯ",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-09-16",
+   "end": "2026-09-16"
+  },
+  {
+   "emp": 12,
+   "course": "ภาวะผู้นำในยุคดิจิทัล (Digital Leadership)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-09-15",
+   "end": "2026-09-15"
+  },
+  {
+   "emp": 12,
+   "course": "ความฉลาดทางดิจิทัล (Digital Intelligence)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-06-16",
+   "end": "2026-06-16"
+  },
+  {
+   "emp": 12,
+   "course": "ความมั่นคงปลอดภัยทางไซเบอร์เบื้องต้น (Basic Cybersecurity Series)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-06-16",
+   "end": "2026-06-16"
+  },
+  {
+   "emp": 12,
+   "course": "ทักษะเอไอระดับพื้นฐาน (AI Basics)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-04",
+   "end": "2025-11-04"
+  },
+  {
+   "emp": 12,
+   "course": "การเปลี่ยนผ่านสู่องค์กรดิจิทัล (Digital Transformation)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-04",
+   "end": "2025-11-04"
+  },
+  {
+   "emp": 13,
+   "course": "ภาวะผู้นำในยุคดิจิทัล (Digital Leadership)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "",
+   "end": ""
+  },
+  {
+   "emp": 13,
+   "course": "ทักษะเอไอระดับพื้นฐาน (AI Basics)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-10-01",
+   "end": "2026-10-01"
+  },
+  {
+   "emp": 13,
+   "course": "AI Governance & Ethics หลักการจริยธรรม ธรรมาภิบาล และข้อกฎหมายในการประยุกต์ใช้ AI",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-10-01",
+   "end": "2026-10-01"
+  },
+  {
+   "emp": 13,
+   "course": "AI for Everyone : ปัญญาประดิษฐ์เพื่ออนาคตของทุกคน",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-10-01",
+   "end": "2026-10-01"
+  },
+  {
+   "emp": 13,
+   "course": "แนวทางในการนำเทคโนโลยีปัญญาประดิษฐ์มาใช้สำหรับบริการภาครัฐ (AI for Government Services)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-10-01",
+   "end": "2026-10-01"
+  },
+  {
+   "emp": 13,
+   "course": "ความรู้ความเข้าใจเกี่ยวกับปัญญาประดิษฐ์ (Artificial Intelligence) สำหรับบุคลากรภาครัฐทุกระดับ",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-10-02",
+   "end": "2026-10-02"
+  },
+  {
+   "emp": 14,
+   "course": "AI for Everyone : ปัญญาประดิษฐ์เพื่ออนาคตของทุกคน",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-16",
+   "end": "2026-03-16"
+  },
+  {
+   "emp": 15,
+   "course": "การออกแบบและพัฒนา Data Visualization สำหรับผู้ปฏิบัติงาน (Data Visualization Design and Development for Practitioners)",
+   "provider": "BDE",
+   "format": "ออนไลน์",
+   "start": "2025-10-21",
+   "end": "2025-10-21"
+  },
+  {
+   "emp": 16,
+   "course": "ความมั่นคงปลอดภัยทางไซเบอร์เบื้องต้น (Basic Cybersecurity Series)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-10-09",
+   "end": "2025-10-09"
+  },
+  {
+   "emp": 16,
+   "course": "ความรู้ความเข้าใจเกี่ยวกับปัญญาประดิษฐ์ (Artificial Intelligence) สำหรับบุคลากรภาครัฐทุกระดับ",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-05",
+   "end": "2026-03-05"
+  },
+  {
+   "emp": 16,
+   "course": "AI Governance & Ethics หลักการจริยธรรม ธรรมาภิบาล และข้อกฎหมายในการประยุกต์ใช้ AI",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-08-31",
+   "end": "2026-08-31"
+  },
+  {
+   "emp": 16,
+   "course": "การเปลี่ยนผ่านสู่องค์กรดิจิทัล (Digital Transformation)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-09-07",
+   "end": "2026-09-07"
+  },
+  {
+   "emp": 18,
+   "course": "AI Governance & Ethics หลักการจริยธรรม ธรรมาภิบาล และข้อกฎหมายในการประยุกต์ใช้ AI",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-25",
+   "end": "2025-11-25"
+  },
+  {
+   "emp": 18,
+   "course": "ความฉลาดทางดิจิทัล (Digital Intelligence)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-25",
+   "end": "2025-11-25"
+  },
+  {
+   "emp": 18,
+   "course": "Leadership in the Age of AI ผู้นำในยุค AI",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-27",
+   "end": "2025-11-27"
+  },
+  {
+   "emp": 18,
+   "course": "ความรู้ความเข้าใจเกี่ยวกับปัญญาประดิษฐ์ (Artificial Intelligence) สำหรับบุคลากรภาครัฐทุกระดับ",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2025-11-27",
+   "end": "2025-11-27"
+  },
+  {
+   "emp": 19,
+   "course": "บทเรียนการออกแบบ UX/UI สุดปังเพื่อดึงดูดความสนใจของผู้ใช้ (Awesome UX/UI design to Grab the User Attention)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-02-13",
+   "end": "2026-02-13"
+  },
+  {
+   "emp": 19,
+   "course": "ทักษะเอไอระดับพื้นฐาน (AI Basics)",
+   "provider": "TDGA",
+   "format": "",
+   "start": "2026-02-13",
+   "end": "2026-02-13"
+  },
+  {
+   "emp": 19,
+   "course": "AI for Everyone : ปัญญาประดิษฐ์เพื่ออนาคตของทุกคน",
+   "provider": "TDGA",
+   "format": "",
+   "start": "2026-09-18",
+   "end": "2026-09-18"
+  },
+  {
+   "emp": 21,
+   "course": "ความเข้าใจและใช้เทคโนโลยีดิจิทัล ทักษะที่จำเป็นสำหรับการปฏิบัติงาน",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-11",
+   "end": "2026-03-11"
+  },
+  {
+   "emp": 21,
+   "course": "ความฉลาดทางดิจิทัล (Digital Intelligence)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-10",
+   "end": "2026-03-10"
+  },
+  {
+   "emp": 22,
+   "course": "แนวทางและแนวปฏิบัติการเปิดเผยข้อมูลภาครัฐ (Open Government Data Guideline)",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-11",
+   "end": "2026-03-11"
+  },
+  {
+   "emp": 22,
+   "course": "การประยุกต์ใช้ความรู้ปัญญาประดิษฐ์ในการพัฒนาหุ่นยนต์สนทนา (Chatbot) เพื่อการบริการภาครัฐ",
+   "provider": "TDGA",
+   "format": "ออนไลน์",
+   "start": "2026-03-11",
+   "end": "2026-03-11"
+  },
+  {
+   "emp": 23,
+   "course": "Google Tools เพื่อการพัฒนางาน",
+   "provider": "BDE",
+   "format": "ออนไลน์",
+   "start": "2025-12-19",
+   "end": "2025-12-19"
+  },
+  {
+   "emp": 23,
+   "course": "ความตระหนักในการใช้เทคโนโลยีให้ปลอดภัยสำหรับผู้ปฏิบัติงาน (Technology Safety Awareness for Practitioners)",
+   "provider": "BDE",
+   "format": "ออนไลน์",
+   "start": "2026-08-24",
+   "end": "2026-08-24"
+  }
+ ],
+ "providerFull": {
+  "TDGA": "สถาบันพัฒนาบุคลากรภาครัฐด้านดิจิทัล (TDGA)",
+  "BDE": "สถาบันพัฒนาบุคลากรด้านดิจิทัล (BDE)",
+  "สดช.": "สำนักงานคณะกรรมการดิจิทัลเพื่อเศรษฐกิจและสังคมแห่งชาติ (สดช.)"
+ },
+ "department": "ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร"
+};
+
+__previewInit();
+</script>
+
+<script>
+/* =========================================================================
+   ค่าคงที่ / ตัวช่วย
+   ========================================================================= */
+const TH_M = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const FY_MONTHS = [10,11,12,1,2,3,4,5,6,7,8,9];
+const MAX_MB = 2;
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const on = v => String(v).toUpperCase() === 'TRUE';
+const norm = s => String(s||'').toLowerCase().replace(/ํา/g,'ำ').replace(/\s+/g,'');
+const todayIso = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const fyOf = iso => { if(!iso) return 0; const [y,m]=iso.split('-').map(Number); return y+543+(m>=10?1:0); };
+const CUR_FY = fyOf(todayIso());
+function thDate(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-').map(Number); return d+' '+TH_M[m-1]+' '+(y+543); }
+function thRange(a,b){
+  if(!a) return 'ไม่ระบุวันที่';
+  if(!b || b===a) return thDate(a);
+  const [y1,m1,d1]=a.split('-').map(Number), [y2,m2,d2]=b.split('-').map(Number);
+  if(y1===y2 && m1===m2) return d1+'–'+d2+' '+TH_M[m1-1]+' '+(y1+543);
+  return thDate(a)+' – '+thDate(b);
+}
+function matchQ(text, q){ const t=norm(text); return String(q||'').trim().split(/\s+/).every(w => t.includes(norm(w))); }
+function hl(text, q){
+  let out = esc(text); const w = String(q||'').trim(); if(!w) return out;
+  const i = text.toLowerCase().indexOf(w.toLowerCase());
+  return i<0 ? out : esc(text.slice(0,i))+'<mark>'+esc(text.slice(i,i+w.length))+'</mark>'+esc(text.slice(i+w.length));
+}
+function toast(msg, kind=''){
+  const t=document.createElement('div'); t.className='toast '+kind; t.textContent=msg;
+  $('#toasts').appendChild(t); setTimeout(()=>t.remove(), kind==='bad'?6000:3200);
+}
+function busy(b){ $('#busy').hidden=!b; }
+
+/* =========================================================================
+   สถานะ + การเรียก server
+   ========================================================================= */
+const S = {
+  data:null, map:{}, tab:'entry', token:null,
+  entry:{ empId:'', items:[] },
+  rep:{ fy:String(CUR_FY), dept:'', type:'', prov:'', q:'', view:'overview', onlyUntrained:false },
+  adm:{ table:'employees', q:'', flag:'', fy:'' }
+};
+try{ S.token = sessionStorage.getItem('admTok'); }catch(e){}
+
+function api(fn, ...args){
+  return new Promise((res, rej) => {
+    google.script.run
+      .withSuccessHandler(res)
+      .withFailureHandler(e => rej(e && e.message ? e : new Error(String(e))))[fn](...args);
+  });
+}
+async function call(fn, ...args){
+  busy(true);
+  try { return await api(fn, ...args); }
+  catch(e){
+    if(/หมดเวลา/.test(e.message)){ setToken(null); render(); }
+    throw e;
+  } finally { busy(false); }
+}
+function setToken(t){ S.token=t; try{ t?sessionStorage.setItem('admTok',t):sessionStorage.removeItem('admTok'); }catch(e){} }
+
+function setData(d){
+  S.data = d; S.map = {};
+  Object.keys(d).forEach(k => { if(Array.isArray(d[k])){ S.map[k]={}; d[k].forEach(r => S.map[k][r.id]=r); } });
+  const st = d.settings || {};
+  if(st.appTitle){ $('#appTitle').textContent = st.appTitle; document.title = st.appTitle; }
+  $('#orgName').textContent = st.orgName || '';
+}
+const nm = (t, id) => (S.map[t] && S.map[t][id] ? S.map[t][id].name : '');
+const sorted = (t, all) => (S.data[t]||[]).filter(r => all || on(r.active))
+  .slice().sort((a,b) => (+a.sort||999)-(+b.sort||999) || a.name.localeCompare(b.name,'th'));
+function empName(e){ if(!e) return ''; const p=nm('prefixes',e.prefixId); return p ? p+(/[.\s]$/.test(p)||p.length>6?' ':'')+e.name : e.name; }
+function provLabel(id){ return nm('providers', id) || ''; }
+function opts(t, sel, ph='— เลือก —', all){ return `<option value="">${ph}</option>` + sorted(t, all).map(r => `<option value="${r.id}" ${r.id===sel?'selected':''}>${esc(r.name)}${r.fullName&&r.fullName!==r.name?' — '+esc(r.fullName):''}</option>`).join(''); }
+function trOf(empId){ return S.data.trainings.filter(t => t.employeeId===empId).sort((a,b)=>(b.startDate||'').localeCompare(a.startDate||'')); }
+
+/* =========================================================================
+   โครง + แท็บ
+   ========================================================================= */
+function render(){
+  const pend = S.data.courses.filter(c => on(c.pending)).length;
+  const tabs = [['entry','บันทึกการอบรม'],['report','รายงาน'],['admin','ผู้ดูแลระบบ'+(S.token&&pend?`<span class="badge warn">${pend}</span>`:'')]];
+  $('#tabs').innerHTML = tabs.map(([k,l]) => `<button class="tab" role="tab" aria-selected="${S.tab===k}" data-act="tab" data-k="${k}">${l}</button>`).join('');
+  const m = $('#main');
+  if(S.tab==='entry') renderEntry(m);
+  else if(S.tab==='report') renderReport(m);
+  else renderAdmin(m);
+}
+
+/* combobox ใช้ร่วมกัน */
+function combo(wrap, getItems, onPick, opt={}){
+  const inp = wrap.querySelector('input'), list = wrap.querySelector('.combo-list');
+  let act = -1, cur = [];
+  function show(){
+    const q = inp.value.trim();
+    cur = getItems().filter(x => !q || matchQ(x.label+' '+(x.sub||''), q)).slice(0, 60);
+    let html = cur.map((x,k) => `<div class="o ${k===act?'act':''}" data-k="${k}" role="option">${hl(x.label,q)}${x.sub?`<small>${esc(x.sub)}</small>`:''}</div>`).join('');
+    if(opt.allowNew && q && !cur.some(x => norm(x.label)===norm(q))){
+      cur.push({ id:'', label:q, isNew:true });
+      html += `<div class="o new ${act===cur.length-1?'act':''}" data-k="${cur.length-1}">+ ใช้ชื่อหลักสูตรใหม่ “${esc(q)}”</div>`;
+    }
+    list.innerHTML = html || '<div class="empty">ไม่พบรายการ</div>';
+    list.hidden = false;
+    const a = list.querySelector('.act'); if(a) a.scrollIntoView({block:'nearest'});
+  }
+  function pick(x){ list.hidden = true; inp.value = x.label; onPick(x); }
+  inp.addEventListener('focus', () => { act=-1; show(); });
+  inp.addEventListener('input', () => { act=0; show(); opt.onInput && opt.onInput(); });
+  inp.addEventListener('keydown', e => {
+    if(list.hidden && e.key==='ArrowDown'){ show(); return; }
+    if(e.key==='ArrowDown'){ act=Math.min(act+1,cur.length-1); show(); e.preventDefault(); }
+    else if(e.key==='ArrowUp'){ act=Math.max(act-1,0); show(); e.preventDefault(); }
+    else if(e.key==='Enter' && !list.hidden){ if(cur[act]) pick(cur[act]); e.preventDefault(); }
+    else if(e.key==='Escape'){ list.hidden=true; }
+  });
+  list.addEventListener('mousedown', e => { const o=e.target.closest('.o'); if(o){ e.preventDefault(); pick(cur[+o.dataset.k]); } });
+  inp.addEventListener('blur', () => setTimeout(() => list.hidden=true, 120));
+}
+
+/* =========================================================================
+   แท็บ 1: บันทึกการอบรม
+   ========================================================================= */
+function newItem(){
+  const f = sorted('formats')[0];
+  return { courseId:'', newCourseName:'', providerId:'', formatId:f?f.id:'', startDate:'', endDate:'', hours:'', note:'', file:null };
+}
+function renderEntry(m){
+  const E = S.entry, emp = S.map.employees[E.empId];
+  if(emp && !E.items.length) E.items.push(newItem());
+  const hist = emp ? trOf(emp.id) : [];
+  m.innerHTML = `
+  <section class="card">
+    <div class="card-h"><span class="step">1</span><h2>ผู้เข้ารับการอบรม</h2></div>
+    <div class="field" style="margin-bottom:${emp?12:0}px">
+      <label for="empInput">ค้นหาชื่อ - นามสกุล</label>
+      <div class="combo" id="empCombo"><input type="text" id="empInput" autocomplete="off" role="combobox" placeholder="พิมพ์ชื่อหรือนามสกุล เช่น  สมชาย" value="${esc(empName(emp))}"><div class="combo-list" role="listbox" hidden></div></div>
+      ${emp?'':'<p class="hint">ไม่พบชื่อของท่าน? กรุณาแจ้งผู้ดูแลระบบเพื่อเพิ่มรายชื่อบุคลากร</p>'}
+    </div>
+    ${emp ? `<div class="person">
+      <div><span>ตำแหน่ง</span> <b>${esc(nm('positions',emp.positionId)||'-')}</b></div>
+      <div><span>สังกัด</span> <b>${esc(nm('departments',emp.departmentId)||'-')}</b></div>
+      <div><span>ประเภท</span> <b>${esc(nm('staffTypes',emp.staffTypeId)||'-')}</b></div>
+      <div><span>บันทึกแล้ว</span> <b>${hist.length} หลักสูตร</b> <span>(ปีงบฯ ${CUR_FY}: ${hist.filter(t=>fyOf(t.startDate)===CUR_FY).length})</span></div>
+    </div>` : ''}
+  </section>
+
+  <section class="card ${emp?'':'off'}" aria-disabled="${!emp}">
+    <div class="card-h"><span class="step">2</span><h2>หลักสูตรที่ผ่านการอบรม</h2><span class="sp"></span><span class="muted" style="font-size:13px">เพิ่มได้หลายหลักสูตรในครั้งเดียว</span></div>
+    <div id="items">${E.items.map((it,i) => itemHtml(it,i,emp)).join('')}</div>
+    <button class="btn ghost" data-act="addItem">+ เพิ่มอีกหลักสูตร</button>
+  </section>
+
+  ${emp ? `<section class="card">
+    <div class="card-h"><h2>ประวัติการอบรมของ ${esc(empName(emp))}</h2></div>
+    ${hist.length ? `<div class="tbl-wrap"><table><thead><tr><th>ปีงบฯ</th><th>วันที่อบรม</th><th>หลักสูตร</th><th>หน่วยงานผู้จัด</th><th>รูปแบบ</th><th>ใบประกาศฯ</th></tr></thead><tbody>
+      ${hist.map(t => `<tr><td>${fyOf(t.startDate)||'-'}</td><td style="white-space:nowrap">${thRange(t.startDate,t.endDate)}</td><td>${esc(nm('courses',t.courseId))}</td><td>${esc(provLabel(t.providerId)||'-')}</td><td>${esc(nm('formats',t.formatId)||'-')}</td><td>${t.certUrl?`<a href="${esc(t.certUrl)}" target="_blank" rel="noopener">เปิดไฟล์</a>`:'<span class="muted">-</span>'}</td></tr>`).join('')}
+    </tbody></table></div>` : '<p class="muted" style="margin:0">ยังไม่มีบันทึกการอบรม</p>'}
+  </section>` : ''}
+
+  <div class="savebar"><div class="savebar-in">
+    <span class="muted">${emp ? `${esc(empName(emp))} · ${E.items.length} หลักสูตร` : 'เลือกชื่อผู้เข้ารับการอบรมก่อน'}</span>
+    ${emp?'<button class="btn" data-act="resetEntry">ล้างฟอร์ม</button>':''}
+    <button class="btn primary" data-act="saveEntry" ${emp?'':'disabled'}>บันทึกข้อมูล</button>
+  </div></div>`;
+
+  combo($('#empCombo'),
+    () => S.data.employees.filter(e => on(e.active)).map(e => ({ id:e.id, label:empName(e), sub:[nm('positions',e.positionId), nm('departments',e.departmentId)].filter(Boolean).join(' · ') })),
+    x => { if(E.empId!==x.id){ E.empId=x.id; E.items=[newItem()]; } renderEntry(m); setTimeout(()=>{ const c=$('#items input'); c&&c.focus(); }, 0); });
+
+  document.querySelectorAll('[data-combo=course]').forEach(w => {
+    const i = +w.dataset.i, it = E.items[i];
+    combo(w,
+      () => S.data.courses.filter(c => on(c.active)).map(c => ({ id:c.id, label:c.name, sub:provLabel(c.providerId) }))
+              .sort((a,b) => a.label.localeCompare(b.label,'th')),
+      x => {
+        const c = S.map.courses[x.id];
+        it.courseId = x.id || ''; it.newCourseName = x.isNew ? x.label : '';
+        if(c){ if(c.providerId) it.providerId = c.providerId; if(c.hours && !it.hours) it.hours = c.hours; }
+        renderEntry(m);
+      },
+      { allowNew:true, onInput:() => { it.courseId=''; it.newCourseName=''; } });
+  });
+  if(!emp) setTimeout(() => $('#empInput').focus(), 0);
+}
+
+function itemHtml(it, i, emp){
+  const id = k => `f${i}-${k}`;
+  const cLabel = it.courseId ? nm('courses', it.courseId) : it.newCourseName;
+  const dup = emp && it.courseId ? trOf(emp.id).find(t => t.courseId===it.courseId) : null;
+  return `<div class="item" data-i="${i}">
+    <div class="item-h"><b>หลักสูตรที่ ${i+1}</b>${S.entry.items.length>1?`<button class="link danger" data-act="rmItem" data-i="${i}">ลบหลักสูตรนี้</button>`:''}</div>
+    <div class="field">
+      <label for="${id('c')}">ชื่อหลักสูตร</label>
+      <div class="combo" data-combo="course" data-i="${i}"><input type="text" id="${id('c')}" autocomplete="off" role="combobox" placeholder="พิมพ์ค้นหา เช่น AI, ไซเบอร์, PDPA" value="${esc(cLabel)}"><div class="combo-list" role="listbox" hidden></div></div>
+      ${it.newCourseName ? '<p class="hint warn">หลักสูตรใหม่ที่ยังไม่มีในระบบ — จะถูกบันทึกและส่งให้ผู้ดูแลระบบตรวจสอบ</p>' : ''}
+      ${dup ? `<p class="hint warn">มีบันทึกหลักสูตรนี้แล้ว (${thRange(dup.startDate,dup.endDate)}) — ตรวจสอบก่อนบันทึกซ้ำ</p>` : ''}
+    </div>
+    <div class="grid g3">
+      <div class="field"><label for="${id('p')}">หน่วยงานผู้จัด / ผู้ออกใบรับรอง</label><select id="${id('p')}" data-f="providerId">${opts('providers', it.providerId)}</select></div>
+      <div class="field" style="grid-column:span 2"><span class="lbl">รูปแบบการอบรม</span><div class="seg">
+        ${sorted('formats').map(f => `<label><input type="radio" name="${id('fmt')}" value="${f.id}" data-f="formatId" ${f.id===it.formatId?'checked':''}>${esc(f.name)}</label>`).join('')}
+      </div></div>
+    </div>
+    <div class="grid g3">
+      <div class="field"><label for="${id('s')}">วันที่อบรม</label><input type="date" id="${id('s')}" data-f="startDate" value="${it.startDate}" max="${todayIso()}"><p class="hint" data-th="startDate">${thDate(it.startDate)}</p></div>
+      <div class="field"><label for="${id('e')}">ถึงวันที่ <span class="opt-tag">(ถ้าอบรมวันเดียว ไม่ต้องกรอก)</span></label><input type="date" id="${id('e')}" data-f="endDate" value="${it.endDate}" min="${it.startDate}"><p class="hint" data-th="endDate">${thDate(it.endDate)}</p></div>
+      <div class="field"><label for="${id('h')}">จำนวนชั่วโมง <span class="opt-tag">(ถ้ามี)</span></label><input type="number" id="${id('h')}" data-f="hours" min="0" step="0.5" value="${esc(it.hours)}"></div>
+    </div>
+    <div class="field" style="margin:0">
+      <label for="${id('file')}">ใบประกาศนียบัตร <span class="opt-tag">PDF / JPG / PNG ไม่เกิน ${MAX_MB} MB</span></label>
+      <div class="filebox">
+        <input type="file" id="${id('file')}" data-f="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" ${it.file?'hidden':''}>
+        ${it.file ? `<span class="ok">✓ ${esc(it.file.name)} (${(it.file.size/1048576).toFixed(2)} MB)</span><button class="link danger" data-act="rmFile" data-i="${i}">เอาไฟล์ออก</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function onItemField(e){
+  const el = e.target, f = el.dataset.f, box = el.closest('.item');
+  if(!f || !box) return;
+  const i = +box.dataset.i, it = S.entry.items[i];
+  if(f==='file'){
+    const file = el.files[0]; if(!file) return;
+    if(!/^(application\/pdf|image\/jpeg|image\/png)$/.test(file.type)){ toast('รองรับเฉพาะไฟล์ PDF, JPG หรือ PNG','bad'); el.value=''; return; }
+    if(file.size > MAX_MB*1048576){ toast('ไฟล์มีขนาดเกิน '+MAX_MB+' MB','bad'); el.value=''; return; }
+    const rd = new FileReader();
+    rd.onload = () => { it.file = { name:file.name, type:file.type, size:file.size, data:String(rd.result).split(',')[1] }; renderEntry($('#main')); };
+    rd.readAsDataURL(file);
+    return;
+  }
+  it[f] = el.value;
+  if(f==='startDate' || f==='endDate'){
+    const h = box.querySelector(`[data-th=${f}]`); if(h) h.textContent = thDate(el.value);
+    if(f==='startDate'){ const e2 = box.querySelector('[data-f=endDate]'); e2.min = el.value; }
+  }
+}
+
+async function saveEntry(){
+  const E = S.entry;
+  for(let i=0; i<E.items.length; i++){
+    const it = E.items[i];
+    if(!it.courseId && !it.newCourseName) return focusErr(i,'c','หลักสูตรที่ '+(i+1)+': กรุณาเลือกชื่อหลักสูตรจากรายการ');
+    if(!it.startDate) return focusErr(i,'s','หลักสูตรที่ '+(i+1)+': กรุณาระบุวันที่อบรม');
+    if(it.endDate && it.endDate < it.startDate) return focusErr(i,'e','หลักสูตรที่ '+(i+1)+': วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม');
+  }
+  try{
+    const res = await call('addTrainings', {
+      employeeId: E.empId,
+      items: E.items.map(it => ({ courseId:it.courseId, newCourseName:it.newCourseName, providerId:it.providerId, formatId:it.formatId,
+        startDate:it.startDate, endDate:it.endDate||it.startDate, hours:it.hours, note:it.note,
+        file: it.file ? { name:it.file.name, type:it.file.type, data:it.file.data } : null }))
+    });
+    setData(res.data);
+    toast('บันทึกเรียบร้อย '+res.saved.length+' หลักสูตร','ok');
+    E.items = [newItem()];
+    render(); window.scrollTo({top:0, behavior:'smooth'});
+  }catch(e){ toast(e.message,'bad'); }
+}
+function focusErr(i, k, msg){ toast(msg,'bad'); const el=$('#f'+i+'-'+k); if(el){ el.scrollIntoView({block:'center'}); el.focus(); } }
+
+/* =========================================================================
+   แท็บ 2: รายงาน
+   ========================================================================= */
+function fyList(){
+  const s = new Set([CUR_FY]); S.data.trainings.forEach(t => { const f=fyOf(t.startDate); if(f) s.add(f); });
+  return [...s].sort((a,b) => b-a);
+}
+function repCompute(){
+  const r = S.rep;
+  const empOk = e => (!r.dept || e.departmentId===r.dept) && (!r.type || e.staffTypeId===r.type) && (!r.q || matchQ(empName(e), r.q));
+  const base = S.data.trainings.filter(t => { const e=S.map.employees[t.employeeId]; return e && empOk(e) && (!r.prov || t.providerId===r.prov); });
+  const trs = base.filter(t => !r.fy || fyOf(t.startDate)===+r.fy);
+  const undated = r.fy ? base.filter(t => !t.startDate) : [];
+  const withTr = new Set(trs.map(t => t.employeeId));
+  const emps = S.data.employees.filter(e => empOk(e) && (on(e.active) || withTr.has(e.id)));
+  return { emps, trs, undated, withTr };
+}
+function renderReport(m){
+  const r = S.rep;
+  m.innerHTML = `
+  <section class="card no-print">
+    <div class="filters">
+      <div class="field"><label for="rf-fy">ปีงบประมาณ</label><select id="rf-fy" data-rf="fy"><option value="">ทุกปี</option>${fyList().map(f=>`<option value="${f}" ${String(f)===r.fy?'selected':''}>พ.ศ. ${f}</option>`).join('')}</select></div>
+      <div class="field"><label for="rf-dept">สังกัด</label><select id="rf-dept" data-rf="dept">${opts('departments', r.dept, 'ทั้งหมด', true)}</select></div>
+      <div class="field"><label for="rf-type">ประเภทเจ้าหน้าที่</label><select id="rf-type" data-rf="type">${opts('staffTypes', r.type, 'ทั้งหมด', true)}</select></div>
+      <div class="field"><label for="rf-prov">หน่วยงานผู้จัด</label><select id="rf-prov" data-rf="prov">${opts('providers', r.prov, 'ทั้งหมด', true)}</select></div>
+      <div class="field"><label for="rf-q">ค้นหาชื่อ</label><input type="search" id="rf-q" data-rf="q" value="${esc(r.q)}" placeholder="ชื่อ / นามสกุล"></div>
+      <div class="actions"><button class="btn" data-act="csv">ส่งออก Excel (CSV)</button><button class="btn" data-act="print">พิมพ์</button></div>
+    </div>
+  </section>
+  <div class="subtabs" role="tablist">
+    ${[['overview','ภาพรวม'],['person','รายบุคคล'],['course','รายหลักสูตร']].map(([k,l]) => `<button class="subtab" role="tab" aria-selected="${r.view===k}" data-act="repView" data-k="${k}">${l}</button>`).join('')}
+  </div>
+  <div id="repBody"></div>`;
+  updateRep();
+}
+function updateRep(){
+  const r = S.rep, D = repCompute(), b = $('#repBody');
+  const fyText = r.fy ? `ปีงบประมาณ พ.ศ. ${r.fy} (1 ต.ค. ${r.fy-1} – 30 ก.ย. ${r.fy})` : 'ทุกปีงบประมาณ';
+  const head = `<div class="print-only"><h2>${esc(S.data.settings.appTitle||'')} — ${r.view==='person'?'รายบุคคล':r.view==='course'?'รายหลักสูตร':'ภาพรวม'}</h2><div>${esc(S.data.settings.orgName||'')}</div><div>${fyText}</div><div class="muted">พิมพ์เมื่อ ${thDate(todayIso())}</div></div>`;
+  const warn = D.undated.length ? `<div class="notice warn no-print"><b>!</b><div>มี ${D.undated.length} รายการที่ไม่ระบุวันที่อบรม จึงไม่ถูกนับในปีงบประมาณใด — ผู้ดูแลระบบแก้ไขได้ที่ “ผู้ดูแลระบบ → รายการอบรม”</div></div>` : '';
+  if(r.view==='overview') b.innerHTML = head + warn + repOverview(D, fyText);
+  else if(r.view==='person') b.innerHTML = head + repPerson(D);
+  else b.innerHTML = head + repCourse(D);
+}
+function vbars(rows, unit){
+  const max = Math.max(1, ...rows.map(x => x.v));
+  return `<div class="vbars">${rows.map(x => `<div class="vb" data-tip="${esc(x.tip||x.l)}: ${x.v} ${unit}"><span class="n">${x.v||''}</span><i style="height:${x.v/max*100}%"></i></div>`).join('')}</div>
+    <div class="vlabels">${rows.map(x => `<span>${esc(x.l)}</span>`).join('')}</div>`;
+}
+function hbars(rows, unit){
+  if(!rows.length) return '<p class="muted">ไม่มีข้อมูล</p>';
+  const max = Math.max(1, ...rows.map(x => x.v));
+  return `<div class="hbars">${rows.map(x => `<div class="hb" data-tip="${esc(x.l)}: ${x.v} ${unit}"><div class="hb-l">${esc(x.l)}</div><div class="hb-t"><i style="width:${x.v/max*100}%"></i></div><div class="hb-v">${x.v}</div></div>`).join('')}</div>`;
+}
+function countBy(arr, key){ const m=new Map(); arr.forEach(x => { const k=key(x); m.set(k,(m.get(k)||0)+1); }); return m; }
+function repOverview(D, fyText){
+  const r = S.rep, total = D.emps.length, trained = D.emps.filter(e => D.withTr.has(e.id)).length;
+  const pct = total ? Math.round(trained/total*100) : 0;
+  const courses = new Set(D.trs.map(t => t.courseId)).size;
+  const hours = D.trs.reduce((s,t) => s + (+t.hours||0), 0);
+  const avg = trained ? (D.trs.length/trained).toFixed(1) : '0';
+  let time;
+  if(r.fy){
+    const fy = +r.fy, cm = countBy(D.trs, t => t.startDate.slice(0,7));
+    time = { t:'จำนวนการอบรมรายเดือน', s:fyText, rows: FY_MONTHS.map(mo => { const y=(mo>=10?fy-1:fy)-543; const k=y+'-'+String(mo).padStart(2,'0'); return { l:TH_M[mo-1], tip:TH_M[mo-1]+' '+(y+543), v:cm.get(k)||0 }; }) };
+  } else {
+    const cm = countBy(D.trs.filter(t=>t.startDate), t => fyOf(t.startDate));
+    time = { t:'จำนวนการอบรมรายปีงบประมาณ', s:'ทุกปี', rows: [...cm.keys()].sort().map(f => ({ l:'ปีงบฯ '+f, v:cm.get(f) })) };
+  }
+  const pm = countBy(D.trs, t => t.providerId);
+  const provRows = [...pm].map(([id,v]) => ({ l:provLabel(id)||'ไม่ระบุ', v })).sort((a,b) => b.v-a.v);
+  const cp = new Map(); D.trs.forEach(t => { if(!cp.has(t.courseId)) cp.set(t.courseId,new Set()); cp.get(t.courseId).add(t.employeeId); });
+  const courseRows = [...cp].map(([id,s]) => ({ l:nm('courses',id), v:s.size })).sort((a,b) => b.v-a.v).slice(0,10);
+  const untrained = D.emps.filter(e => !D.withTr.has(e.id));
+  return `
+  <div class="kpis">
+    <div class="kpi"><div class="k">บุคลากรทั้งหมด</div><div class="v">${total}</div><div class="s">คน</div></div>
+    <div class="kpi"><div class="k">ผ่านการอบรมอย่างน้อย 1 หลักสูตร</div><div class="v">${trained} <span style="font-size:16px;font-weight:600">(${pct}%)</span></div><div class="meter" role="img" aria-label="${pct}%"><i style="width:${pct}%"></i></div></div>
+    <div class="kpi"><div class="k">ยังไม่มีบันทึกการอบรม</div><div class="v">${untrained.length}</div><div class="s">คน</div></div>
+    <div class="kpi"><div class="k">จำนวนการอบรมทั้งหมด</div><div class="v">${D.trs.length}</div><div class="s">ครั้ง · เฉลี่ย ${avg} หลักสูตร/คน</div></div>
+    <div class="kpi"><div class="k">จำนวนหลักสูตร</div><div class="v">${courses}</div><div class="s">หลักสูตร${hours?` · รวม ${hours.toLocaleString('th-TH')} ชั่วโมง`:''}</div></div>
+  </div>
+  <div class="charts">
+    <section class="card wide"><h3 class="chart-t">${time.t}</h3><p class="chart-s">${time.s} · หน่วย: ครั้ง</p>${time.rows.length?vbars(time.rows,'ครั้ง'):'<p class="muted">ไม่มีข้อมูล</p>'}</section>
+    <section class="card"><h3 class="chart-t">แยกตามหน่วยงานผู้จัด</h3><p class="chart-s">จำนวนครั้งที่อบรม</p>${hbars(provRows,'ครั้ง')}</section>
+    <section class="card"><h3 class="chart-t">หลักสูตรยอดนิยม 10 อันดับ</h3><p class="chart-s">จำนวนผู้ผ่านการอบรม (คน)</p>${hbars(courseRows,'คน')}</section>
+    <section class="card wide"><div class="card-h"><h3 class="chart-t" style="margin:0">ผู้ที่ยังไม่มีบันทึกการอบรม (${untrained.length} คน)</h3></div>
+      ${untrained.length ? `<div class="tbl-wrap"><table><thead><tr><th>ลำดับ</th><th>ชื่อ - นามสกุล</th><th>ตำแหน่ง</th><th>สังกัด</th></tr></thead><tbody>${untrained.map((e,i) => `<tr><td>${i+1}</td><td>${esc(empName(e))}</td><td>${esc(nm('positions',e.positionId))}</td><td>${esc(nm('departments',e.departmentId))}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted" style="margin:0">ทุกคนมีบันทึกการอบรมแล้ว</p>'}
+    </section>
+  </div>`;
+}
+function repPerson(D){
+  const r = S.rep;
+  const list = D.emps.filter(e => !r.onlyUntrained || !D.withTr.has(e.id));
+  const body = list.map((e,i) => {
+    const ts = D.trs.filter(t => t.employeeId===e.id).sort((a,b) => (a.startDate||'').localeCompare(b.startDate||''));
+    const n = Math.max(1, ts.length), rs = n>1 ? ` rowspan="${n}"` : '';
+    const lead = `<td${rs}>${i+1}</td><td${rs}><b style="font-weight:600">${esc(empName(e))}</b></td><td${rs}>${esc(nm('positions',e.positionId))}</td>`;
+    if(!ts.length) return `<tbody><tr>${lead}<td colspan="4" class="empty-row">ยังไม่มีบันทึกการอบรม</td></tr></tbody>`;
+    return '<tbody>' + ts.map((t,k) => `<tr>${k?'':lead}<td>${k+1}. ${esc(nm('courses',t.courseId))}${t.certUrl?` <a class="no-print" href="${esc(t.certUrl)}" target="_blank" rel="noopener" title="ใบประกาศนียบัตร">[ไฟล์]</a>`:''}</td><td>${esc(provLabel(t.providerId)||'-')}</td><td>${esc(nm('formats',t.formatId)||'-')}</td><td style="white-space:nowrap">${thRange(t.startDate,t.endDate)}</td></tr>`).join('') + '</tbody>';
+  }).join('');
+  return `<section class="card">
+    <div class="card-h no-print"><h2>รายงานการอบรมรายบุคคล</h2><span class="sp"></span>
+      <label style="display:flex;gap:6px;align-items:center;font-size:14px"><input type="checkbox" data-rf="onlyUntrained" ${r.onlyUntrained?'checked':''}> แสดงเฉพาะผู้ที่ยังไม่มีบันทึก</label></div>
+    <div class="tbl-wrap"><table class="rep"><thead><tr><th>ลำดับ</th><th>ชื่อ - นามสกุล</th><th>ตำแหน่ง</th><th>หลักสูตรที่ผ่านการอบรม</th><th>หน่วยงานผู้จัด</th><th>รูปแบบ</th><th>ช่วงเวลาที่อบรม</th></tr></thead>
+    ${body || '<tbody><tr><td colspan="7" class="empty-row">ไม่มีข้อมูล</td></tr></tbody>'}</table></div>
+  </section>`;
+}
+function repCourse(D){
+  const g = new Map(); D.trs.forEach(t => { if(!g.has(t.courseId)) g.set(t.courseId, []); g.get(t.courseId).push(t); });
+  const rows = [...g].map(([id,ts]) => ({ c:S.map.courses[id]||{name:'(ไม่พบหลักสูตร)'}, ts, ppl:[...new Set(ts.map(t=>t.employeeId))] }))
+    .sort((a,b) => b.ppl.length-a.ppl.length || a.c.name.localeCompare(b.c.name,'th'));
+  return `<section class="card"><div class="card-h"><h2>สรุปรายหลักสูตร (${rows.length} หลักสูตร)</h2></div>
+    <div class="tbl-wrap"><table><thead><tr><th>ลำดับ</th><th>หลักสูตร</th><th>หน่วยงานผู้จัด</th><th class="num">ผู้ผ่าน (คน)</th><th>รายชื่อผู้ผ่านการอบรม</th></tr></thead><tbody>
+    ${rows.map((x,i) => `<tr><td>${i+1}</td><td>${esc(x.c.name)}</td><td>${esc(provLabel(x.c.providerId)||provLabel(x.ts[0].providerId)||'-')}</td><td class="num">${x.ppl.length}</td><td>${x.ppl.map(id => esc(empName(S.map.employees[id]))).join(', ')}</td></tr>`).join('') || '<tr><td colspan="5" class="empty-row">ไม่มีข้อมูล</td></tr>'}
+    </tbody></table></div></section>`;
+}
+function exportCsv(){
+  const D = repCompute(), r = S.rep;
+  const head = ['ลำดับ','คำนำหน้า','ชื่อ - นามสกุล','ตำแหน่ง','สังกัด','ประเภทเจ้าหน้าที่','หลักสูตรที่ผ่านการอบรม','หน่วยงานผู้จัด','รูปแบบการอบรม','วันที่เริ่ม','วันที่สิ้นสุด','ช่วงเวลาที่อบรม','ปีงบประมาณ','จำนวนชั่วโมง','ลิงก์ใบประกาศนียบัตร'];
+  const rows = [head]; let n = 0;
+  D.emps.forEach(e => {
+    const ts = D.trs.filter(t => t.employeeId===e.id).sort((a,b) => (a.startDate||'').localeCompare(b.startDate||''));
+    const base = [++n, nm('prefixes',e.prefixId), e.name, nm('positions',e.positionId), nm('departments',e.departmentId), nm('staffTypes',e.staffTypeId)];
+    if(!ts.length) rows.push(base.concat(['','','','','','','','','']));
+    ts.forEach(t => rows.push(base.concat([nm('courses',t.courseId), provLabel(t.providerId), nm('formats',t.formatId), t.startDate?thDate(t.startDate):'', t.endDate?thDate(t.endDate):'', t.startDate?thRange(t.startDate,t.endDate):'', fyOf(t.startDate)||'', t.hours, t.certUrl])));
+  });
+  const csv = '﻿' + rows.map(r => r.map(v => { v=String(v??''); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }).join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'รายงานการอบรม_' + (r.fy ? 'ปีงบ'+r.fy : 'ทุกปี') + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* =========================================================================
+   แท็บ 3: ผู้ดูแลระบบ
+   ========================================================================= */
+const REF_COLS = {
+  prefixes:[['employees','prefixId']], positions:[['employees','positionId']], staffTypes:[['employees','staffTypeId']],
+  departments:[['employees','departmentId']], providers:[['courses','providerId'],['trainings','providerId']],
+  formats:[['trainings','formatId']], categories:[['courses','categoryId']], courses:[['trainings','courseId']], employees:[['trainings','employeeId']]
+};
+const F_NAME = { k:'name', l:'ชื่อ', req:1 }, F_SORT = { k:'sort', l:'ลำดับการแสดงผล', t:'number' }, F_ACT = { k:'active', l:'เปิดใช้งาน (แสดงในตัวเลือก)', t:'bool' };
+const SCHEMA = {
+  employees:  { label:'บุคลากร', group:'ข้อมูลหลัก', fields:[{k:'prefixId',l:'คำนำหน้า',t:'ref',ref:'prefixes'},{k:'name',l:'ชื่อ - นามสกุล',req:1},{k:'positionId',l:'ตำแหน่ง',t:'ref',ref:'positions'},{k:'departmentId',l:'สังกัด',t:'ref',ref:'departments'},{k:'staffTypeId',l:'ประเภทเจ้าหน้าที่',t:'ref',ref:'staffTypes'},{k:'email',l:'อีเมล',t:'email'},F_ACT],
+                bulk:'ชื่อ-นามสกุล (มีคำนำหน้าได้) | ตำแหน่ง | สังกัด | ประเภทเจ้าหน้าที่', bulkEx:'นางสาวสมใจ ใจดี | นักวิชาการคอมพิวเตอร์ปฏิบัติการ | ศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร | ข้าราชการ' },
+  courses:    { label:'หลักสูตร', group:'ข้อมูลหลัก', fields:[{k:'name',l:'ชื่อหลักสูตร',req:1},{k:'providerId',l:'หน่วยงานผู้จัด (ค่าเริ่มต้น)',t:'ref',ref:'providers'},{k:'hours',l:'จำนวนชั่วโมง',t:'number'},{k:'categoryId',l:'หมวดหมู่',t:'ref',ref:'categories',addNew:1},F_ACT,{k:'pending',l:'รอตรวจสอบ (ผู้ใช้เพิ่มเอง)',t:'bool'}],
+                bulk:'ชื่อหลักสูตร | หน่วยงานผู้จัด (ชื่อย่อ) | จำนวนชั่วโมง', bulkEx:'ทักษะเอไอระดับพื้นฐาน (AI Basics) | TDGA | 3' },
+  providers:  { label:'หน่วยงานผู้จัด', group:'ข้อมูลหลัก', fields:[{k:'name',l:'ชื่อย่อ',req:1},{k:'fullName',l:'ชื่อเต็ม'},F_SORT,F_ACT], bulk:'ชื่อย่อ | ชื่อเต็ม', bulkEx:'TDGA | สถาบันพัฒนาบุคลากรภาครัฐด้านดิจิทัล' },
+  positions:  { label:'ตำแหน่ง', group:'ข้อมูลประกอบ', fields:[F_NAME,F_SORT,F_ACT], bulk:'ชื่อตำแหน่ง' },
+  departments:{ label:'สังกัด', group:'ข้อมูลประกอบ', fields:[F_NAME,F_SORT,F_ACT], bulk:'ชื่อสังกัด' },
+  staffTypes: { label:'ประเภทเจ้าหน้าที่', group:'ข้อมูลประกอบ', fields:[F_NAME,F_SORT,F_ACT], bulk:'ชื่อประเภท' },
+  prefixes:   { label:'คำนำหน้า', group:'ข้อมูลประกอบ', fields:[F_NAME,F_SORT,F_ACT], bulk:'คำนำหน้า' },
+  categories: { label:'หมวดหมู่หลักสูตร', group:'ข้อมูลประกอบ', fields:[F_NAME,F_SORT,F_ACT], bulk:'ชื่อหมวดหมู่' },
+  formats:    { label:'รูปแบบการอบรม', group:'ข้อมูลประกอบ', fields:[F_NAME,F_SORT,F_ACT], bulk:'รูปแบบ' },
+  trainings:  { label:'รายการอบรม', group:'ข้อมูลการอบรม', fields:[{k:'employeeId',l:'ผู้เข้ารับการอบรม',t:'ref',ref:'employees',req:1},{k:'courseId',l:'หลักสูตร',t:'ref',ref:'courses',req:1},{k:'providerId',l:'หน่วยงานผู้จัด',t:'ref',ref:'providers'},{k:'formatId',l:'รูปแบบการอบรม',t:'ref',ref:'formats'},{k:'startDate',l:'วันที่เริ่ม',t:'date'},{k:'endDate',l:'วันที่สิ้นสุด',t:'date'},{k:'hours',l:'จำนวนชั่วโมง',t:'number'},{k:'certUrl',l:'ลิงก์ใบประกาศนียบัตร'},{k:'note',l:'หมายเหตุ'}] },
+  settings:   { label:'ตั้งค่าระบบ', group:'ระบบ' }
+};
+function usage(t, id){ return (REF_COLS[t]||[]).reduce((n,[tt,k]) => n + S.data[tt].filter(r => r[k]===id).length, 0); }
+function refLabel(t, id){ return t==='employees' ? empName(S.map.employees[id]) : nm(t, id); }
+
+function renderAdmin(m){
+  if(!S.token){
+    m.innerHTML = `<section class="card login"><div class="card-h"><h2>เข้าสู่ระบบผู้ดูแล</h2></div>
+      <form id="loginForm"><div class="field"><label for="admPw">รหัสผ่านผู้ดูแลระบบ</label><input type="password" id="admPw" autocomplete="current-password" required></div>
+      <button class="btn primary" style="width:100%">เข้าสู่ระบบ</button></form></section>`;
+    $('#loginForm').onsubmit = async e => { e.preventDefault(); try{ setToken(await call('adminLogin', $('#admPw').value)); toast('เข้าสู่ระบบแล้ว','ok'); render(); }catch(err){ toast(err.message,'bad'); } };
+    setTimeout(() => $('#admPw').focus(), 0);
+    return;
+  }
+  const A = S.adm, groups = {};
+  Object.entries(SCHEMA).forEach(([k,s]) => (groups[s.group] = groups[s.group]||[]).push(k));
+  const cnt = k => k==='settings' ? '' : (S.data[k]||[]).length;
+  const pend = S.data.courses.filter(c => on(c.pending)).length;
+  const undated = S.data.trainings.filter(t => !t.startDate).length;
+  const noprov = S.data.trainings.filter(t => !t.providerId).length;
+  m.innerHTML = `<div class="adm">
+    <nav class="side" aria-label="เมนูผู้ดูแล">
+      ${Object.entries(groups).map(([g,ks]) => `<h4>${g}</h4>` + ks.map(k => `<button data-act="admTable" data-k="${k}" aria-current="${A.table===k}"><span>${SCHEMA[k].label}</span>${k==='courses'&&pend?`<span class="badge warn">${pend} รอตรวจ</span>`:`<span class="badge mute">${cnt(k)}</span>`}</button>`).join('')).join('')}
+      <h4></h4><button data-act="logout"><span>ออกจากระบบผู้ดูแล</span></button>
+    </nav>
+    <div>
+      ${(pend||undated||noprov) ? `<div class="quality">
+        ${pend?`<button class="qchip" data-act="admFlag" data-t="courses" data-k="pending">หลักสูตรรอตรวจสอบ ${pend}</button>`:''}
+        ${undated?`<button class="qchip" data-act="admFlag" data-t="trainings" data-k="undated">รายการอบรมไม่ระบุวันที่ ${undated}</button>`:''}
+        ${noprov?`<button class="qchip" data-act="admFlag" data-t="trainings" data-k="noprov">รายการอบรมไม่ระบุหน่วยงานผู้จัด ${noprov}</button>`:''}
+      </div>` : ''}
+      <section class="card" id="admCard"></section>
+    </div></div>`;
+  renderAdmCard();
+}
+function renderAdmCard(){
+  const A = S.adm, t = A.table, s = SCHEMA[t], c = $('#admCard');
+  if(t==='settings'){
+    const st = S.data.settings;
+    c.innerHTML = `<div class="card-h"><h2>ตั้งค่าระบบ</h2></div>
+      <form id="setForm">
+        <div class="field"><label for="s-title">ชื่อระบบ</label><input type="text" id="s-title" value="${esc(st.appTitle)}"></div>
+        <div class="field"><label for="s-org">ชื่อหน่วยงาน (แสดงใต้ชื่อระบบและหัวรายงาน)</label><input type="text" id="s-org" value="${esc(st.orgName)}"></div>
+        <div class="grid g2"><div class="field"><label for="s-pw">รหัสผ่านผู้ดูแลใหม่ <span class="opt-tag">(เว้นว่างถ้าไม่เปลี่ยน)</span></label><input type="password" id="s-pw" autocomplete="new-password" minlength="8"></div>
+        <div class="field"><label for="s-pw2">ยืนยันรหัสผ่านใหม่</label><input type="password" id="s-pw2" autocomplete="new-password"></div></div>
+        <button class="btn primary">บันทึกการตั้งค่า</button>
+      </form>`;
+    $('#setForm').onsubmit = async e => {
+      e.preventDefault();
+      const pw = $('#s-pw').value; if(pw !== $('#s-pw2').value) return toast('รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน','bad');
+      try{ const d = await call('adminSaveSettings', S.token, { appTitle:$('#s-title').value.trim(), orgName:$('#s-org').value.trim(), newPassword:pw }); if(d.newToken){ setToken(d.newToken); delete d.newToken; } setData(d); toast('บันทึกการตั้งค่าแล้ว','ok'); render(); }catch(err){ toast(err.message,'bad'); }
+    };
+    return;
+  }
+  const isTr = t==='trainings';
+  c.innerHTML = `<div class="card-h"><h2>${s.label}</h2><span class="sp"></span>
+      ${s.bulk?`<button class="btn sm" data-act="admBulk">เพิ่มหลายรายการ</button>`:''}
+      ${isTr?`<button class="btn sm" data-act="tab" data-k="entry">ไปหน้าบันทึกการอบรม</button>`:''}
+      <button class="btn sm primary" data-act="admEdit" data-id="">+ เพิ่ม${s.label}</button></div>
+    <div class="toolbar">
+      <input type="search" id="admQ" placeholder="ค้นหา..." value="${esc(A.q)}" aria-label="ค้นหา">
+      ${isTr?`<select id="admFy" aria-label="ปีงบประมาณ"><option value="">ทุกปีงบฯ</option>${fyList().map(f=>`<option value="${f}" ${String(f)===A.fy?'selected':''}>ปีงบฯ ${f}</option>`).join('')}</select>`:''}
+      ${A.flag?`<span class="st pend">${A.flag==='pending'?'เฉพาะรอตรวจสอบ':A.flag==='undated'?'เฉพาะไม่ระบุวันที่':'เฉพาะไม่ระบุหน่วยงาน'}</span><button class="link" data-act="admFlag" data-t="${t}" data-k="">ล้างตัวกรอง</button>`:''}
+    </div>
+    <div class="tbl-wrap" id="admBody"></div>`;
+  $('#admQ').addEventListener('input', e => { A.q = e.target.value; admBody(); });
+  if(isTr) $('#admFy').onchange = e => { A.fy = e.target.value; admBody(); };
+  admBody();
+}
+function admBody(){
+  const A = S.adm, t = A.table, b = $('#admBody');
+  let rows = S.data[t].slice();
+  const actions = (r, merge) => `<td class="act"><button class="link" data-act="admEdit" data-id="${r.id}">แก้ไข</button>${merge?`<button class="link" data-act="admMerge" data-id="${r.id}">รวม</button>`:''}<button class="link danger" data-act="admDel" data-id="${r.id}">ลบ</button></td>`;
+  const stat = r => on(r.pending) ? '<span class="st pend">รอตรวจสอบ</span>' : on(r.active) ? '<span class="st on">ใช้งาน</span>' : '<span class="st off">ปิดใช้งาน</span>';
+  let head, line;
+  if(t==='trainings'){
+    if(A.flag==='undated') rows = rows.filter(r => !r.startDate);
+    if(A.flag==='noprov') rows = rows.filter(r => !r.providerId);
+    if(A.fy) rows = rows.filter(r => fyOf(r.startDate)===+A.fy);
+    if(A.q) rows = rows.filter(r => matchQ(empName(S.map.employees[r.employeeId])+' '+nm('courses',r.courseId)+' '+provLabel(r.providerId), A.q));
+    rows.sort((a,b) => (b.startDate||'9').localeCompare(a.startDate||'9'));
+    head = '<th>วันที่อบรม</th><th>ผู้เข้ารับการอบรม</th><th>หลักสูตร</th><th>หน่วยงาน</th><th>รูปแบบ</th><th>ไฟล์</th><th></th>';
+    line = r => `<tr><td style="white-space:nowrap">${r.startDate?thRange(r.startDate,r.endDate):'<span class="st pend">ไม่ระบุ</span>'}</td><td>${esc(empName(S.map.employees[r.employeeId]))}</td><td>${esc(nm('courses',r.courseId))}</td><td>${esc(provLabel(r.providerId))||'<span class="st pend">ไม่ระบุ</span>'}</td><td>${esc(nm('formats',r.formatId))}</td><td>${r.certUrl?`<a href="${esc(r.certUrl)}" target="_blank" rel="noopener">เปิด</a>`:''}</td>${actions(r,false)}</tr>`;
+  } else {
+    if(A.flag==='pending') rows = rows.filter(r => on(r.pending));
+    const label = r => t==='employees' ? empName(r) : r.name;
+    if(A.q) rows = rows.filter(r => matchQ(label(r)+' '+(r.fullName||'')+' '+nm('positions',r.positionId), A.q));
+    if(t!=='employees') rows.sort((a,b) => (on(b.pending)-on(a.pending)) || (+a.sort||999)-(+b.sort||999) || a.name.localeCompare(b.name,'th'));
+    if(t==='employees'){
+      head = '<th>ชื่อ - นามสกุล</th><th>ตำแหน่ง</th><th>สังกัด</th><th>ประเภท</th><th class="num">อบรม</th><th>สถานะ</th><th></th>';
+      line = r => `<tr class="${on(r.active)?'':'inactive'}"><td>${esc(empName(r))}</td><td>${esc(nm('positions',r.positionId))}</td><td>${esc(nm('departments',r.departmentId))}</td><td>${esc(nm('staffTypes',r.staffTypeId))}</td><td class="num">${usage(t,r.id)}</td><td>${stat(r)}</td>${actions(r,true)}</tr>`;
+    } else if(t==='courses'){
+      head = '<th>ชื่อหลักสูตร</th><th>หน่วยงานผู้จัด</th><th class="num">ชม.</th><th class="num">ผู้ผ่าน</th><th>สถานะ</th><th></th>';
+      line = r => `<tr class="${on(r.active)?'':'inactive'}"><td>${esc(r.name)}${r.categoryId&&nm('categories',r.categoryId)?` <span class="badge mute">${esc(nm('categories',r.categoryId))}</span>`:''}</td><td>${esc(provLabel(r.providerId))}</td><td class="num">${esc(r.hours)}</td><td class="num">${usage(t,r.id)}</td><td>${stat(r)}</td>${actions(r,true)}</tr>`;
+    } else {
+      const full = t==='providers';
+      head = `<th>${full?'ชื่อย่อ':'ชื่อ'}</th>${full?'<th>ชื่อเต็ม</th>':''}<th class="num">ลำดับ</th><th class="num">ถูกใช้</th><th>สถานะ</th><th></th>`;
+      line = r => `<tr class="${on(r.active)?'':'inactive'}"><td>${esc(r.name)}</td>${full?`<td>${esc(r.fullName)}</td>`:''}<td class="num">${esc(r.sort)}</td><td class="num">${usage(t,r.id)}</td><td>${stat(r)}</td>${actions(r,true)}</tr>`;
+    }
+  }
+  b.innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${rows.map(line).join('') || `<tr><td colspan="8" class="empty-row">ไม่พบข้อมูล</td></tr>`}</tbody></table>`;
+}
+
+/* ฟอร์มเพิ่ม/แก้ไข (สร้างจาก SCHEMA) */
+function admEdit(id){
+  const t = S.adm.table, s = SCHEMA[t], rec = id ? Object.assign({}, S.map[t][id]) : { active:'TRUE', pending:'FALSE' };
+  const field = f => {
+    const v = rec[f.k] ?? '', fid = 'm-'+f.k;
+    if(f.t==='bool') return `<div class="field"><label style="display:flex;gap:8px;align-items:center;font-weight:400"><input type="checkbox" id="${fid}" ${on(v)?'checked':''}> ${f.l}</label></div>`;
+    if(f.t==='ref'){
+      const list = f.ref==='employees'
+        ? S.data.employees.slice().sort((a,b)=>a.name.localeCompare(b.name,'th')).map(e => `<option value="${e.id}" ${e.id===v?'selected':''}>${esc(empName(e))}</option>`).join('')
+        : sorted(f.ref, true).map(r => `<option value="${r.id}" ${r.id===v?'selected':''}>${esc(r.name)}${on(r.active)?'':' (ปิดใช้งาน)'}</option>`).join('');
+      return `<div class="field"><label for="${fid}">${f.l}</label><select id="${fid}"><option value="">— ไม่ระบุ —</option>${list}${f.addNew?'<option value="__new">+ เพิ่มหมวดหมู่ใหม่…</option>':''}</select>${f.addNew?`<input type="text" id="${fid}-new" placeholder="พิมพ์ชื่อหมวดหมู่ใหม่" style="margin-top:8px" hidden>`:''}</div>`;
+    }
+    return `<div class="field"><label for="${fid}">${f.l}${f.req?' *':''}</label><input type="${f.t==='number'?'number':f.t==='date'?'date':f.t==='email'?'email':'text'}" id="${fid}" value="${esc(v)}" ${f.t==='number'?'min="0" step="any"':''}></div>`;
+  };
+  openModal((id?'แก้ไข':'เพิ่ม') + s.label, s.fields.map(field).join(''), {
+    onOk: async () => {
+      const out = { id: rec.id || '' };
+      for(const f of s.fields){
+        const el = $('#m-'+f.k);
+        out[f.k] = f.t==='bool' ? (el.checked?'TRUE':'FALSE') : el.value.trim();
+        if(f.addNew && out[f.k]==='__new'){
+          const nn = $('#m-'+f.k+'-new').value.trim();
+          if(!nn){ $('#m-'+f.k+'-new').focus(); throw new Error('กรุณาพิมพ์ชื่อหมวดหมู่ใหม่'); }
+          const ex = (S.data[f.ref]||[]).find(r => norm(r.name)===norm(nn));
+          if(ex) out[f.k] = ex.id;
+          else { const d = await call('adminSave', S.token, f.ref, { id:'', name:nn, sort:'', active:'TRUE' }); setData(d); out[f.k] = d[f.ref].find(r => norm(r.name)===norm(nn)).id; }
+        }
+        if(f.req && !out[f.k]){ el.focus(); throw new Error('กรุณากรอก '+f.l); }
+      }
+      if(t==='trainings' && out.endDate && out.startDate && out.endDate < out.startDate) throw new Error('วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม');
+      if(t==='trainings' && !out.endDate) out.endDate = out.startDate;
+      setData(await call('adminSave', S.token, t, out));
+      toast('บันทึกแล้ว','ok'); render();
+    }
+  });
+}
+function admDel(id){
+  const t = S.adm.table, u = usage(t, id), label = t==='trainings' ? nm('courses',S.map.trainings[id].courseId)+' — '+empName(S.map.employees[S.map.trainings[id].employeeId]) : refLabel(t,id);
+  if(u){
+    openModal('ลบไม่ได้', `<p style="margin:0">“${esc(label)}” ถูกใช้อยู่ ${u} รายการ</p><p class="hint">แนะนำ: ใช้ <b>แก้ไข → ปิดใช้งาน</b> เพื่อซ่อนจากตัวเลือก หรือใช้ <b>รวม</b> เพื่อย้ายข้อมูลไปยังรายการที่ถูกต้องก่อน</p>`, { okText:'รวมรายการ', onOk: () => { setTimeout(() => admMerge(id), 0); } });
+    return;
+  }
+  openModal('ยืนยันการลบ', `<p style="margin:0">ต้องการลบ “${esc(label)}” ใช่หรือไม่? การลบไม่สามารถย้อนกลับได้</p>`, { okText:'ลบ', danger:true,
+    onOk: async () => { setData(await call('adminDelete', S.token, t, id)); toast('ลบแล้ว','ok'); render(); } });
+}
+function admMerge(id){
+  const t = S.adm.table, label = refLabel(t,id), u = usage(t,id);
+  const others = (t==='employees' ? S.data.employees.slice().sort((a,b)=>a.name.localeCompare(b.name,'th')) : sorted(t,true)).filter(r => r.id!==id);
+  openModal('รวมรายการซ้ำ', `
+    <p style="margin-top:0">ย้ายข้อมูลที่อ้างอิง “<b>${esc(label)}</b>” (${u} รายการ) ไปยังรายการปลายทาง แล้วลบ “${esc(label)}” ออก</p>
+    <div class="field"><label for="m-target">รวมเข้ากับ</label><select id="m-target"><option value="">— เลือกรายการที่ถูกต้อง —</option>${others.map(r => `<option value="${r.id}">${esc(refLabel(t,r.id))}</option>`).join('')}</select></div>
+    <p class="hint">เหมาะสำหรับหลักสูตรที่ชื่อเขียนต่างกันเล็กน้อย หรือหลักสูตรที่ผู้ใช้เพิ่มเอง (รอตรวจสอบ)</p>`,
+  { okText:'รวมรายการ', onOk: async () => {
+      const to = $('#m-target').value; if(!to) throw new Error('กรุณาเลือกรายการปลายทาง');
+      setData(await call('adminMerge', S.token, t, id, to)); toast('รวมรายการแล้ว','ok'); render();
+  }});
+}
+function admBulk(){
+  const t = S.adm.table, s = SCHEMA[t];
+  openModal('เพิ่ม'+s.label+'หลายรายการ', `
+    <p style="margin-top:0">วางข้อมูลบรรทัดละ 1 รายการ (คัดลอกจาก Excel ได้เลย คอลัมน์จะคั่นด้วย Tab หรือใช้ <code>|</code> คั่น)</p>
+    <p class="hint" style="margin-bottom:10px">รูปแบบ: <b>${esc(s.bulk)}</b>${s.bulkEx?`<br>ตัวอย่าง: ${esc(s.bulkEx)}`:''}<br>รายการที่ชื่อซ้ำกับที่มีอยู่จะถูกข้าม · ตำแหน่ง/สังกัด/หน่วยงานที่ยังไม่มีจะถูกสร้างให้อัตโนมัติ</p>
+    <textarea id="m-bulk" aria-label="ข้อมูล"></textarea>`,
+  { okText:'เพิ่มข้อมูล', onOk: async () => {
+      const lines = $('#m-bulk').value.split(/\r?\n/).filter(l => l.trim());
+      if(!lines.length) throw new Error('ยังไม่มีข้อมูล');
+      const r = await call('adminBulkAdd', S.token, t, lines);
+      setData(r.data); toast(`เพิ่ม ${r.added} รายการ${r.skipped?` · ข้ามรายการซ้ำ ${r.skipped}`:''}`,'ok'); render();
+  }});
+  setTimeout(() => $('#m-bulk').focus(), 0);
+}
+
+/* modal */
+function openModal(title, body, { okText='บันทึก', onOk, danger }={}){
+  const m = $('#modal'), prev = document.activeElement;
+  m.innerHTML = `<div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="mh"><h3 id="mTitle">${esc(title)}</h3><button class="x" data-close aria-label="ปิด">×</button></div>
+    <div class="mb">${body}</div>
+    <div class="mf"><button class="btn" data-close>ยกเลิก</button><button class="btn ${danger?'danger':'primary'}" id="mOk">${okText}</button></div></div>`;
+  m.hidden = false;
+  const close = () => { m.hidden = true; m.innerHTML = ''; prev && prev.focus && prev.focus(); };
+  m.onclick = e => { if(e.target===m || e.target.closest('[data-close]')) close(); };
+  m.onkeydown = e => { if(e.key==='Escape') close(); };
+  $('#mOk').onclick = async () => { try{ const r = await onOk(); if(r!==false && !m.hidden) close(); }catch(e){ toast(e.message,'bad'); } };
+  m.querySelectorAll('select').forEach(sel => { const n = $('#'+sel.id+'-new'); if(n) sel.onchange = () => { n.hidden = sel.value!=='__new'; if(!n.hidden) n.focus(); }; });
+  setTimeout(() => { const f = m.querySelector('.mb input, .mb select, .mb textarea') || $('#mOk'); f.focus(); }, 0);
+}
+
+/* =========================================================================
+   events
+   ========================================================================= */
+const ACT = {
+  tab: a => { S.tab = a.dataset.k; render(); window.scrollTo(0,0); },
+  addItem: () => { S.entry.items.push(newItem()); renderEntry($('#main')); setTimeout(() => { const l=document.querySelectorAll('.item'); l[l.length-1].querySelector('input').focus(); },0); },
+  rmItem: a => { S.entry.items.splice(+a.dataset.i,1); renderEntry($('#main')); },
+  rmFile: a => { S.entry.items[+a.dataset.i].file = null; renderEntry($('#main')); },
+  resetEntry: () => { S.entry = { empId:'', items:[] }; renderEntry($('#main')); },
+  saveEntry: saveEntry,
+  repView: a => { S.rep.view = a.dataset.k; renderReport($('#main')); },
+  csv: exportCsv,
+  print: () => window.print(),
+  admTable: a => { S.adm = { table:a.dataset.k, q:'', flag:'', fy:'' }; render(); },
+  admFlag: a => { S.adm = { table:a.dataset.t, q:'', flag:a.dataset.k, fy:'' }; render(); },
+  admEdit: a => admEdit(a.dataset.id),
+  admDel: a => admDel(a.dataset.id),
+  admMerge: a => admMerge(a.dataset.id),
+  admBulk: admBulk,
+  logout: () => { setToken(null); S.tab='entry'; render(); toast('ออกจากระบบผู้ดูแลแล้ว'); }
+};
+document.addEventListener('click', e => { const a = e.target.closest('[data-act]'); if(a && ACT[a.dataset.act]){ e.preventDefault(); ACT[a.dataset.act](a, e); } });
+document.addEventListener('input', e => {
+  if(e.target.closest('.item') && e.target.type!=='file' && e.target.type!=='radio') onItemField(e);
+  const rf = e.target.dataset.rf;
+  if(rf==='q'){ S.rep.q = e.target.value; updateRep(); }
+});
+document.addEventListener('change', e => {
+  if(e.target.closest('.item') && (e.target.type==='radio' || e.target.type==='file' || e.target.tagName==='SELECT')) onItemField(e);
+  const rf = e.target.dataset.rf;
+  if(rf && rf!=='q'){ S.rep[rf] = e.target.type==='checkbox' ? e.target.checked : e.target.value; updateRep(); }
+});
+/* tooltip สำหรับกราฟ */
+const tip = $('#tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest('[data-tip]');
+  if(!t){ tip.hidden = true; return; }
+  tip.textContent = t.dataset.tip; tip.hidden = false;
+  const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8);
+  tip.style.left = x+'px'; tip.style.top = (e.clientY + 16)+'px';
+});
+
+/* boot */
+api('getBootstrap').then(d => { setData(d); render(); })
+  .catch(e => { $('#main').innerHTML = `<div class="card"><h2>โหลดข้อมูลไม่สำเร็จ</h2><p>${esc(e.message)}</p><p class="muted">ผู้ดูแลระบบ: ตรวจสอบว่าได้รัน setup() แล้ว</p></div>`; });
+</script>
+</body>
+</html>
