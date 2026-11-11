@@ -40,6 +40,8 @@ Web app บน Google Apps Script ใช้ Google Sheets เป็นฐาน�
    - เรียกใช้ในฐานะ: **ฉัน (meetspace.dft@gmail.com)**
    - ผู้มีสิทธิ์เข้าถึง: **ทุกคนที่มีบัญชี Google** (บัญชี Gmail ธรรมดาเลือก "ภายในกรมฯ" ไม่ได้)
 10. คัดลอก URL ที่ได้ (ลงท้ายด้วย `/exec`) ไปใส่ใน `<iframe src="...">` ของหน้า GitHub Pages
+    - ทำแล้วใน `docs/index.html` (ฝัง URL ไว้แล้ว) → เปิด GitHub Pages: repo **Settings → Pages → Source: Deploy from a branch → Branch `main` / โฟลเดอร์ `/docs`** แล้วจะได้ลิงก์ `https://narisornj.github.io/trainingsystem/`
+    - ถ้า Deploy ใหม่จนได้ URL ใหม่ ให้แก้ `src` ใน `docs/index.html`
 11. เปิด Web app → **ผู้ดูแลระบบ** → ใช้รหัสเริ่มต้น `admin1234` → **ตั้งค่าระบบ → เปลี่ยนรหัสผ่านทันที**
 12. แชร์ชีตเป็น "ผู้แก้ไข" ให้ผู้ดูแลอีก 1–2 คน เผื่อกรณีเจ้าของบัญชีไม่อยู่
 
